@@ -1,0 +1,17 @@
+*= 256
+*= !_init_
+	mov #1,x
+	mov #2,y
+	mov #3,t
+	mov #4,p
+	mov #5,u
+	jmp !coolThing
+	jmp $256
+*= !coolThing
+	mov #5,x
+	mov #4,y
+	mov #3,t
+	mov #2,p
+	mov #1,u
+	jmp !_init_
+return 0
