@@ -1,0 +1,7 @@
+- 9/7/22 12:25am
+
+Finishing up implementing instructions from asm.py
+Some work may need done on variables for mov
+Also some testing is needed, mainly on labels if somehow I got one of vb+ wrong.
+
+See you tomorrow!
