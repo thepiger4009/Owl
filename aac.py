@@ -1,5 +1,27 @@
-# Assembler & Compiler
-# 8-29-22
+#/~aac.py
+"""
+MIT License
+
+Copyright (c) 2022 thepiger4009
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
 
 from linecache import getline
 
@@ -87,9 +109,28 @@ while 1:
 		vb+=2
 
 	if fullLine[0] == "dec":
+		vb+=2
 
-	
+	if fullLine[0] == "den":
+		vb+=1
 
+	if fullLine[0] == "dbk":
+		vb+=1
+
+	if fullLine[0] == "sef":
+		vb+=2
+
+	if fullLine[0] == "nop":
+		vb+=1
+
+	if fullLine[0] == "isp":
+		vb+=1
+
+	if fullLine[0] == "dsp":
+		vb+=1
+
+	if fullLine[0] == "ehi":
+		vb+=1
 
 
 	lc+=1
@@ -668,6 +709,34 @@ while 1:
 			except:
 				next
 			rom.write("112\n"),rom.write(str(address_pos[1])),rom.write("\n")
+
+	if fullLine[0] == "den": # Display Enter
+		rom.write("130\n")
+
+	if fullLine[0] == "dbk": # Display Backspace
+		rom.write("125\n")
+
+	if fullLine[0] == "dcs": # Display clear
+		rom.write("132\n")
+
+	if fullLine[0] == "sef": # Set Equal Flag
+		val = fullLine[1]
+		rom.write("116\n"),rom.write(str(val)),rom.write("\n")
+
+	if fullLine[0] == "nop": # No Operation
+		rom.write("123\n")
+
+	if fullLine[0] == "isp":
+		rom.write("119\n")
+
+	if fullLine[0] == "dsp":
+		rom.write("120\n")
+
+	if fullLine[0] == "ehi":
+		rom.write("121\n")
+	
+
+	
 
 
 		
