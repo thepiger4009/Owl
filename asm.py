@@ -801,8 +801,6 @@ while True:
         reg = fullLine[1]
         if reg == "x":
             out.writelines("131\n1\n")
-        if reg == "y":
-            out.writelines("131\n2\n")
         if reg == "t":
             out.writelines("131\n3\n")
         if reg == "p":

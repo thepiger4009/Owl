@@ -105,6 +105,9 @@ while 1:
 	if fullLine[0] == "jmp":
 		vb+=2
 
+	if fullLine[0] == "jsr":
+		vb+=2
+
 	if fullLine[0] == "inc":
 		vb+=2
 
@@ -131,6 +134,24 @@ while 1:
 
 	if fullLine[0] == "ehi":
 		vb+=1
+
+	if fullLine[0] == "dhi":
+		vb+=1
+
+	if fullLine[0] == "rts":
+		vb+=1
+
+	if fullLine[0] == "dra":
+		vb+=2
+
+	if fullLine[0] == "drv":
+		vb+=2
+
+	if fullLine[0] == "add":
+		vb+=3
+	
+	if fullLine[0] == "sub":
+		vb+=3
 
 
 	lc+=1
@@ -734,6 +755,261 @@ while 1:
 
 	if fullLine[0] == "ehi":
 		rom.write("121\n")
+
+	if fullLine[0] == "dhi":
+		rom.write("122\n")
+
+	if fullLine[0] == "jsr":
+		if "!" in statement1:
+			try:
+				address_name = statement1.split("!"[0])
+			except:
+				next
+			address_got = getLabelAddress(address_name[1])
+			rom.write("126\n"),rom.write(str(address_got)),rom.write("\n")
+
+		if "$" in statement1:
+			try:
+				address_pos	= statement1.split("$"[0])
+			except:
+				next
+			rom.write("126\n"),rom.write(str(address_pos[1])),rom.write("\n")
+
+	if fullLine[0] == "rts":
+		rom.write("127\n")
+
+	if fullLine[0] == "dra": # Display register ascii
+		reg = fullLine[1]
+		match reg:
+			case "x":
+				rom.write("124\n1\n")
+			case "y":
+				rom.write("124\n2\n")
+			case "t":
+				rom.write("124\n3\n")
+			case "p":
+				rom.write("124\n4\n")
+			case "u":
+				rom.write("124\n5\n")
+
+	if fullLine[0] == "drv": # Display register value
+		reg = fullLine[1]
+		match reg:
+			case "x":
+				rom.write("131\n1\n")
+			case "y":
+				rom.write("131\n2\n")
+			case "t":
+				rom.write("131\n3\n")
+			case "p":
+				rom.write("131\n4\n")
+			case "u":
+				rom.write("131\n5\n")
+
+	if fullLine[0] == "add": # Add register to registser
+		statement1 = statements[0] #REGISTER 1
+		statement2 = statements[1] #REGISTER 2
+
+		match statement1:
+			case "x":
+				match statement2:
+					case "x":
+						rom.write("113\n1\n1\n")
+					case "y":
+						rom.write("113\n1\n2\n")
+					case "t":
+						rom.write("113\n1\n3\n")
+					case "p":
+						rom.write("113\n1\n4\n")
+					case "u":
+						rom.write("113\n1\n5\n")
+			case "y":
+				match statement2:
+					case "x":
+						rom.write("113\n2\n1\n")
+					case "y":
+						rom.write("113\n2\n2\n")
+					case "t":
+						rom.write("113\n2\n3\n")
+					case "p":
+						rom.write("113\n2\n4\n")
+					case "u":
+						rom.write("113\n2\n5\n")
+			case "t":
+				match statement2:
+					case "x":
+						rom.write("113\n3\n1\n")
+					case "y":
+						rom.write("113\n3\n2\n")
+					case "t":
+						rom.write("113\n3\n3\n")	
+					case "p":
+						rom.write("113\n3\n4\n")
+					case "u":
+						rom.write("113\n3\n5\n")
+			case "p":
+				match statement2:
+					case "x":
+						rom.write("113\n4\n1\n")
+					case "y":
+						rom.write("113\n4\n2\n")
+					case "t":
+						rom.write("113\n4\n3\n")
+					case "p":
+						rom.write("113\n4\n4\n")
+					case "u":
+						rom.write("113\n4\n5\n")
+			case "u":
+				match statement2:
+					case "x":
+						rom.write("113\n5\n1\n")
+					case "y":
+						rom.write("113\n5\n2\n")
+					case "t":
+						rom.write("113\n5\n3\n")
+					case "p":
+						rom.write("113\n5\n4\n")
+					case "u":
+						rom.write("113\n5\n5\n")
+
+	if fullLine[0] == "sub": # Sub register from registser
+		statement1 = statements[0] #REGISTER 1
+		statement2 = statements[1] #REGISTER 2
+
+		match statement1:
+			case "x":
+				match statement2:
+					case "x":
+						rom.write("114\n1\n1\n")
+					case "y":
+						rom.write("114\n1\n2\n")
+					case "t":
+						rom.write("114\n1\n3\n")
+					case "p":
+						rom.write("114\n1\n4\n")
+					case "u":
+						rom.write("114\n1\n5\n")
+			case "y":
+				match statement2:
+					case "x":
+						rom.write("114\n2\n1\n")
+					case "y":
+						rom.write("114\n2\n2\n")
+					case "t":
+						rom.write("114\n2\n3\n")
+					case "p":
+						rom.write("114\n2\n4\n")
+					case "u":
+						rom.write("114\n2\n5\n")
+			case "t":
+				match statement2:
+					case "x":
+						rom.write("114\n3\n1\n")
+					case "y":
+						rom.write("114\n3\n2\n")
+					case "t":
+						rom.write("114\n3\n3\n")	
+					case "p":
+						rom.write("114\n3\n4\n")
+					case "u":
+						rom.write("114\n3\n5\n")
+			case "p":
+				match statement2:
+					case "x":
+						rom.write("114\n4\n1\n")
+					case "y":
+						rom.write("114\n4\n2\n")
+					case "t":
+						rom.write("114\n4\n3\n")
+					case "p":
+						rom.write("114\n4\n4\n")
+					case "u":
+						rom.write("114\n4\n5\n")
+			case "u":
+				match statement2:
+					case "x":
+						rom.write("114\n5\n1\n")
+					case "y":
+						rom.write("114\n5\n2\n")
+					case "t":
+						rom.write("114\n5\n3\n")
+					case "p":
+						rom.write("114\n5\n4\n")
+					case "u":
+						rom.write("114\n5\n5\n")
+
+	if fullLine[0] == "cmp":
+		statement1 = statements[0] #REGISTER 1
+		statement2 = statements[1] #REGISTER 2
+
+		match statement1:
+			case "x":
+				match statement2:
+					case "x":
+						rom.write("114\n1\n1\n")
+					case "y":
+						rom.write("114\n1\n2\n")
+					case "t":
+						rom.write("114\n1\n3\n")
+					case "p":
+						rom.write("114\n1\n4\n")
+					case "u":
+						rom.write("114\n1\n5\n")
+			case "y":
+				match statement2:
+					case "x":
+						rom.write("114\n2\n1\n")
+					case "y":
+						rom.write("114\n2\n2\n")
+					case "t":
+						rom.write("114\n2\n3\n")
+					case "p":
+						rom.write("114\n2\n4\n")
+					case "u":
+						rom.write("114\n2\n5\n")
+			case "t":
+				match statement2:
+					case "x":
+						rom.write("114\n3\n1\n")
+					case "y":
+						rom.write("114\n3\n2\n")
+					case "t":
+						rom.write("114\n3\n3\n")	
+					case "p":
+						rom.write("114\n3\n4\n")
+					case "u":
+						rom.write("114\n3\n5\n")
+			case "p":
+				match statement2:
+					case "x":
+						rom.write("114\n4\n1\n")
+					case "y":
+						rom.write("114\n4\n2\n")
+					case "t":
+						rom.write("114\n4\n3\n")
+					case "p":
+						rom.write("114\n4\n4\n")
+					case "u":
+						rom.write("114\n4\n5\n")
+			case "u":
+				match statement2:
+					case "x":
+						rom.write("114\n5\n1\n")
+					case "y":
+						rom.write("114\n5\n2\n")
+					case "t":
+						rom.write("114\n5\n3\n")
+					case "p":
+						rom.write("114\n5\n4\n")
+					case "u":
+						rom.write("114\n5\n5\n")
+
+	
+
+
+
+
+
 	
 
 	
