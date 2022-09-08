@@ -1,17 +1,10 @@
+//First Main Test of AAC OR 'Assembler And Compiler'
+//9-7-22 Author: Landon Smith
+//LICENSE: MIT
+//-------------------------------------
+.string 5000 Hello World } 
+.var hello_string 5000
 *= 256
-*= !_init_
-	mov #1,x
-	mov #2,y
-	mov #3,t
-	mov #4,p
-	mov #5,u
-	jmp !coolThing
-	jmp $256
-*= !coolThing
-	mov #5,x
-	mov #4,y
-	mov #3,t
-	mov #2,p
-	mov #1,u
-	jmp !_init_
+*= !__init__
+	mov p%5000,x
 return 0

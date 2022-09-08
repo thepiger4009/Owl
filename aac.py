@@ -43,7 +43,6 @@ labelCounter = 0
 
 #Files
 rom = open("rom.txt","w+")
-debug = open("aac_debug.txt","w+")
 
 #Functions
 def getVariableAddress(name):
@@ -70,10 +69,8 @@ while 1:
 		variableAddressList[variableCounter] = address
 		variableCounter+=1
 
-
 	if fullLine[0] == "*=": # Create a address point or label point
 		aon = fullLine[1] # ADDRESS OR NAME
-		debug.write("[DEBUG]:")
 		if "!" in aon:    # IF IS NAME DO THIS
 			try:
 				name = aon.split("!"[0])
@@ -93,11 +90,24 @@ while 1:
 			print("[aac]: Label Created:",name[1],"located at",distance)
 			print("[aac]: When calling",name[1],"the returned value is:",getLabelAddress(name[1]))
 
+			vb = 0 
 
 
 		else: # IF IS NUMBER DO THIS
 			last_address_given = aon
 			rom.write("loadAddress\n"),rom.write(aon),rom.write("\n")
+
+	if fullLine[0] == ".string":
+		selected_address = fullLine[1]
+		tcc = 2
+		rom.write("loadAddress\n"),rom.write(str(selected_address)),rom.write("\n")
+		while 1:
+			if fullLine[tcc] == "}":
+				break
+			for x in range(len(fullLine[tcc])):
+				rom.write(str(ord(fullLine[tcc][x]))),rom.write("\n")
+			rom.write("32\n")
+			tcc+=1
 
 	if fullLine[0] == "mov":
 		vb+=3
@@ -151,6 +161,9 @@ while 1:
 		vb+=3
 	
 	if fullLine[0] == "sub":
+		vb+=3
+
+	if fullLine[0] == "cmp":
 		vb+=3
 
 
@@ -212,13 +225,13 @@ while 1:
 				rom.write("101\n1\n"),rom.write(str(address)),rom.write("\n")
 			if "p%" in statement1: #Transfer mem+rp to register
 				try:
-					statement3 = statement1.split("!"[0])
+					statement3 = statement1.split("p%"[0])
 				except:
 					next
 				rom.write("102\n1\n"),rom.write(statement3[1]),rom.write("\n")
 			if "u%" in statement1: #Transfer mem+ru to register
 				try:
-					statement3 = statement1.split("!"[0])
+					statement3 = statement1.split("u%"[0])
 				except:
 					next
 				rom.write("103\n1\n"),rom.write(statement3[1]),rom.write("\n")
@@ -254,13 +267,13 @@ while 1:
 				rom.write("104\n1\n"),rom.write(str(address)),rom.write("\n")
 			if "p%" in statement2: #Transfer mem+rp to register
 				try:
-					statement3 = statement2.split("!"[0])
+					statement3 = statement2.split("p%"[0])
 				except:
 					next
 				rom.write("105\n1\n"),rom.write(statement3[1]),rom.write("\n")
 			if "u%" in statement2: #Transfer mem+ru to register
 				try:
-					statement3 = statement2.split("!"[0])
+					statement3 = statement2.split("u%"[0])
 				except:
 					next
 				rom.write("106\n1\n"),rom.write(statement3[1]),rom.write("\n")
@@ -307,13 +320,13 @@ while 1:
 				rom.write("101\n2\n"),rom.write(str(address)),rom.write("\n")
 			if "p%" in statement1: #Transfer mem+rp to register
 				try:
-					statement3 = statement1.split("!"[0])
+					statement3 = statement1.split("p%"[0])
 				except:
 					next
 				rom.write("102\n2\n"),rom.write(statement3[1]),rom.write("\n")
 			if "u%" in statement1: #Transfer mem+ru to register
 				try:
-					statement3 = statement1.split("!"[0])
+					statement3 = statement1.split("u%"[0])
 				except:
 					next
 				rom.write("103\n2\n"),rom.write(statement3[1]),rom.write("\n")
@@ -349,13 +362,13 @@ while 1:
 				rom.write("104\n2\n"),rom.write(str(address)),rom.write("\n")
 			if "p%" in statement2: #Transfer mem+rp to register
 				try:
-					statement3 = statement2.split("!"[0])
+					statement3 = statement2.split("p%"[0])
 				except:
 					next
 				rom.write("105\n2\n"),rom.write(statement3[1]),rom.write("\n")
 			if "u%" in statement2: #Transfer mem+ru to register
 				try:
-					statement3 = statement2.split("!"[0])
+					statement3 = statement2.split("u%"[0])
 				except:
 					next
 				rom.write("106\n2\n"),rom.write(statement3[1]),rom.write("\n")
@@ -403,13 +416,13 @@ while 1:
 				rom.write("101\n3\n"),rom.write(str(address)),rom.write("\n")
 			if "p%" in statement1: #Transfer mem+rp to register
 				try:
-					statement3 = statement1.split("!"[0])
+					statement3 = statement1.split("p%"[0])
 				except:
 					next
 				rom.write("102\n3\n"),rom.write(statement3[1]),rom.write("\n")
 			if "u%" in statement1: #Transfer mem+ru to register
 				try:
-					statement3 = statement1.split("!"[0])
+					statement3 = statement1.split("u%"[0])
 				except:
 					next
 				rom.write("103\n3\n"),rom.write(statement3[1]),rom.write("\n")
@@ -445,13 +458,13 @@ while 1:
 				rom.write("104\n3\n"),rom.write(str(address)),rom.write("\n")
 			if "p%" in statement2: #Transfer mem+rp to register
 				try:
-					statement3 = statement2.split("!"[0])
+					statement3 = statement2.split("p%"[0])
 				except:
 					next
 				rom.write("105\n3\n"),rom.write(statement3[1]),rom.write("\n")
 			if "u%" in statement2: #Transfer mem+ru to register
 				try:
-					statement3 = statement2.split("!"[0])
+					statement3 = statement2.split("u%"[0])
 				except:
 					next
 				rom.write("106\n3\n"),rom.write(statement3[1]),rom.write("\n")
@@ -499,16 +512,17 @@ while 1:
 				rom.write("101\n4\n"),rom.write(str(address)),rom.write("\n")
 			if "p%" in statement1: #Transfer mem+rp to register
 				try:
-					statement3 = statement1.split("!"[0])
+					statement3 = statement1.split("p%"[0])
 				except:
 					next
+				print("[aac]:",statement3[1])
 				rom.write("102\n4\n"),rom.write(statement3[1]),rom.write("\n")
 			if "u%" in statement1: #Transfer mem+ru to register
 				try:
-					statement3 = statement1.split("!"[0])
+					statement3 = statement1.split("u%"[0])
 				except:
 					next
-				rom.write("103\n4\n"),rom.write(statement3[1]),rom.write("\n")
+				rom.write("103\n4\n"),rom.write(statement3[0]),rom.write("\n")
 			if statement1 == "stack":
 				rom.write("118\n4\n")
 		#----------------------REGISTER P ON SECOND * MOV ?,P * -------------------
@@ -541,13 +555,13 @@ while 1:
 				rom.write("104\n4\n"),rom.write(str(address)),rom.write("\n")
 			if "p%" in statement2: #Transfer mem+rp to register
 				try:
-					statement3 = statement2.split("!"[0])
+					statement3 = statement2.split("p%"[0])
 				except:
 					next
 				rom.write("105\n4\n"),rom.write(statement3[1]),rom.write("\n")
 			if "u%" in statement2: #Transfer mem+ru to register
 				try:
-					statement3 = statement2.split("!"[0])
+					statement3 = statement2.split("u%"[0])
 				except:
 					next
 				rom.write("106\n4\n"),rom.write(statement3[1]),rom.write("\n")
@@ -595,16 +609,16 @@ while 1:
 				rom.write("101\n5\n"),rom.write(str(address)),rom.write("\n")
 			if "p%" in statement1: #Transfer mem+rp to register
 				try:
-					statement3 = statement1.split("!"[0])
+					statement3 = statement1.split("p%"[0])
 				except:
 					next
-				rom.write("102\n5\n"),rom.write(statement3[1]),rom.write("\n")
+				rom.write("102\n5\n"),rom.write(statement3[0]),rom.write("\n")
 			if "u%" in statement1: #Transfer mem+ru to register
 				try:
-					statement3 = statement1.split("!"[0])
+					statement3 = statement1.split("u%"[0])
 				except:
 					next
-				rom.write("103\n5\n"),rom.write(statement3[1]),rom.write("\n")
+				rom.write("103\n5\n"),rom.write(statement3[0]),rom.write("\n")
 			if statement1 == "stack":
 				rom.write("118\n5\n")
 		#----------------------REGISTER U ON SECOND * MOV ?,U * -------------------
@@ -637,13 +651,13 @@ while 1:
 				rom.write("104\n5\n"),rom.write(str(address)),rom.write("\n")
 			if "p%" in statement2: #Transfer mem+rp to register
 				try:
-					statement3 = statement2.split("!"[0])
+					statement3 = statement2.split("p%"[0])
 				except:
 					next
 				rom.write("105\n5\n"),rom.write(statement3[1]),rom.write("\n")
 			if "u%" in statement2: #Transfer mem+ru to register
 				try:
-					statement3 = statement2.split("!"[0])
+					statement3 = statement2.split("u%"[0])
 				except:
 					next
 				rom.write("106\n5\n"),rom.write(statement3[1]),rom.write("\n")
@@ -698,6 +712,7 @@ while 1:
 				rom.write("108\n5\n")
 
 	if fullLine[0] == "beq":
+		statement1 = statements[0]
 
 		if "!" in fullLine[1]:
 			try:
@@ -715,6 +730,7 @@ while 1:
 			rom.write("111\n"),rom.write(str(address_pos[1])),rom.write("\n")
 
 	if fullLine[0] == "bne":
+		statement1 = statements[0]
 
 		if "!" in fullLine[1]:
 			try:
@@ -760,6 +776,7 @@ while 1:
 		rom.write("122\n")
 
 	if fullLine[0] == "jsr":
+		statement1 = statements[0]
 		if "!" in statement1:
 			try:
 				address_name = statement1.split("!"[0])
@@ -946,65 +963,80 @@ while 1:
 			case "x":
 				match statement2:
 					case "x":
-						rom.write("114\n1\n1\n")
+						rom.write("129\n1\n1\n")
 					case "y":
-						rom.write("114\n1\n2\n")
+						rom.write("129\n1\n2\n")
 					case "t":
-						rom.write("114\n1\n3\n")
+						rom.write("129\n1\n3\n")
 					case "p":
-						rom.write("114\n1\n4\n")
+						rom.write("129\n1\n4\n")
 					case "u":
-						rom.write("114\n1\n5\n")
+						rom.write("129\n1\n5\n")
 			case "y":
 				match statement2:
 					case "x":
-						rom.write("114\n2\n1\n")
+						rom.write("129\n2\n1\n")
 					case "y":
-						rom.write("114\n2\n2\n")
+						rom.write("129\n2\n2\n")
 					case "t":
-						rom.write("114\n2\n3\n")
+						rom.write("129\n2\n3\n")
 					case "p":
-						rom.write("114\n2\n4\n")
+						rom.write("129\n2\n4\n")
 					case "u":
-						rom.write("114\n2\n5\n")
+						rom.write("129\n2\n5\n")
 			case "t":
 				match statement2:
 					case "x":
-						rom.write("114\n3\n1\n")
+						rom.write("129\n3\n1\n")
 					case "y":
-						rom.write("114\n3\n2\n")
+						rom.write("129\n3\n2\n")
 					case "t":
-						rom.write("114\n3\n3\n")	
+						rom.write("129\n3\n3\n")	
 					case "p":
-						rom.write("114\n3\n4\n")
+						rom.write("129\n3\n4\n")
 					case "u":
-						rom.write("114\n3\n5\n")
+						rom.write("129\n3\n5\n")
 			case "p":
 				match statement2:
 					case "x":
-						rom.write("114\n4\n1\n")
+						rom.write("129\n4\n1\n")
 					case "y":
-						rom.write("114\n4\n2\n")
+						rom.write("129\n4\n2\n")
 					case "t":
-						rom.write("114\n4\n3\n")
+						rom.write("129\n4\n3\n")
 					case "p":
-						rom.write("114\n4\n4\n")
+						rom.write("129\n4\n4\n")
 					case "u":
-						rom.write("114\n4\n5\n")
+						rom.write("129\n4\n5\n")
 			case "u":
 				match statement2:
 					case "x":
-						rom.write("114\n5\n1\n")
+						rom.write("129\n5\n1\n")
 					case "y":
-						rom.write("114\n5\n2\n")
+						rom.write("129\n5\n2\n")
 					case "t":
-						rom.write("114\n5\n3\n")
+						rom.write("129\n5\n3\n")
 					case "p":
-						rom.write("114\n5\n4\n")
+						rom.write("129\n5\n4\n")
 					case "u":
-						rom.write("114\n5\n5\n")
+						rom.write("129\n5\n5\n")
 
-	
+		if "#" in statement2:
+			try:
+				selected_value = statement2.split("#"[0])
+			except:
+				next
+				match statement1:
+					case "x":
+						rom.write("115\n1\n"),rom.write(str(selected_value)),rom.write("\n")
+					case "y":
+						rom.write("115\n2\n"),rom.write(str(selected_value)),rom.write("\n")
+					case "t":
+						rom.write("115\n3\n"),rom.write(str(selected_value)),rom.write("\n")
+					case "p":
+						rom.write("115\n4\n"),rom.write(str(selected_value)),rom.write("\n")
+					case "u":
+						rom.write("115\n5\n"),rom.write(str(selected_value)),rom.write("\n")
 
 
 
