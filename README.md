@@ -6,5 +6,7 @@ Five 8-bit Index/Accumulator Registers
 655356 bytes of memory or 64kb
 
 # Note:
-When using the aac or more known as the 'Assembler and Compiler', you should keep any .string calls at the end or begging on a file or else it messes with the loadAddress. I'll fix it in the future.
+This is a alpha or something, I have made multiple of these sorry. But mainly there will be issues with this and some features are not probably added and will be added soon.
 
+# Future Plans:
+The plan currently is to get a working kernel and some programs going but the future future goal is to have the processor more realistic with a bus and cycle accuracy including more accurate memory and some other chips emulated to go along with this.
