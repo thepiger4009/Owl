@@ -1,17 +1,4 @@
-//First Main Test of AAC OR 'Assembler And Compiler'
-//9-7-22 Author: Landon Smith
-//LICENSE: MIT
-//-------------------------------------
-.string 5000 Hello World } 
-.var hello_string 5000
-*= $256
-	mov p%5000,x
-	dra x
-	cmp p,#11
-	beq !__loop__
-	inc p 
-	bne $256
-*= !__loop__
-	mov #50,u
-	jmp !__loop__
-return 0
+//KernelSPE_
+//- A working kernel for the SPE_ -//
+//Author: Landon Smith
+//Date:   9/8/22

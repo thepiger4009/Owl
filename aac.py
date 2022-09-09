@@ -24,6 +24,7 @@ SOFTWARE.
 """
 
 from linecache import getline
+from os import system
 
 #Variables
 lc = 1
@@ -88,9 +89,7 @@ while 1:
 			labelCounter+=1
 
 			print("[aac]: Label Created:",name[1],"located at",distance)
-			print("[aac]: When calling",name[1],"the returned value is:",getLabelAddress(name[1]))
 
-			vb = 0 
 
 
 		else: # IF IS NUMBER DO THIS

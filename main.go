@@ -22,12 +22,12 @@ var memory [65536]uint16
 var stack [256]uint16
 var rx, ry, rt, rp, ru uint16
 var ir, sp uint8
-var pc uint16 = 256
+var pc uint16 = 0
 var ef, mf uint8
 var hei uint8
 
 // 1 - Enable | 0 - Disable
-var debugDisplay int = 0
+var debugDisplay int = 1
 
 func main() {
 

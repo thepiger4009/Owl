@@ -1,7 +1,13 @@
-- 9/7/22 12:25am
+- 9/8/22 11:15 PM
 
-Finishing up implementing instructions from asm.py
-Some work may need done on variables for mov
-Also some testing is needed, mainly on labels if somehow I got one of vb+ wrong.
+Testing AAC and making sure that things are functioning, also fixing any bugs that are found and possible some additions to AAC.
 
-See you tomorrow!
+11:30PM:
+
+First succesfull label test ever, had to remove vb = 0 as I thought it fixed something yesterday but it actually broke the label system.
+Holy Shit.
+
+12:25 AM:
+
+Done with work on this today, I'm tired and need to go to bed.
+
