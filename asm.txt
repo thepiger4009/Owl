@@ -4,7 +4,14 @@
 //-------------------------------------
 .string 5000 Hello World } 
 .var hello_string 5000
-*= 256
-*= !__init__
+*= $256
 	mov p%5000,x
+	dra x
+	cmp p,#11
+	beq !__loop__
+	inc p 
+	bne $256
+*= !__loop__
+	mov #50,u
+	jmp !__loop__
 return 0
