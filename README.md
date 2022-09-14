@@ -1,16 +1,12 @@
 # SPE_
-SPE, stands for 'Simple Processor Emulation'. This project is my attempt at making a system or fantasy computer using my knowledge of CPUs and python including golang. It currently is lacking features like a proper bus, cycle count, timing, io, and a system board for that matter. It currently still doesn't have a working compiler or kernel/OS but it does have a working assembler.
+SPE_ or 'Simple Processor Emulation' is a emulated processor which runs simple. It currently lacks certain qualities of real processors and still needs work but it should get better over time.
 
-# Future of SPE_
-Starting as of 9/14/22, more effort will be put torwards the compiler and improving the SPE_ core itself and making it more realistic.
+# Features:
+Five 8-bit Index/Accumulator Registers
+655356 bytes of memory or 64kb
 
-# Working as of 9-14-22 12:00AM
-- Assembler
-- SPE_ Core
+# Note:
+This is a alpha or something, I have made multiple of these sorry. But mainly there will be issues with this and some features are not probably added and will be added soon.
 
-# Not Working as of 9-14-22 12:01AM
-- Compiler
-
-# 9-14-22 Plans
-- Work on compiler variables and arrays
-- Start work on improving SPE_ core running on golang
+# Future Plans:
+The plan currently is to get a working kernel and some programs going but the future future goal is to have the processor more realistic with a bus and cycle accuracy including more accurate memory and some other chips emulated to go along with this.

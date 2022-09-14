@@ -1,19 +1,12 @@
 //--------------------
 //Compiled Program
 //Compiled by: speC
-//Compiled Time: 14:0:48
+//Compiled Time: 23:55:10
 //--------------------
 jmp $256 //Start
 *= $256 //Default Compiled Program Address
-*= !__main__
-.var task55 *
-.var rx_cache *
-.var ry_cache *
-.var rt_cache *
-.var rp_cache *
-.var ru_cache *
-//
-//
-*= !__cacheRX__
-    mov x,!rx_cache
-   mov yreturn 0
+*= !main
+ jsr !__cacheRX__
+  mov #100,x
+    mov x,!money
+   jsr !__retrieveRX__

@@ -1,5 +1,12 @@
-# Test Compile
-mk __main__ {
-    declare task55 int
+#~/cpl.txt
+#
+#Test of speC
+#
+mk main {
+    declare money int
+    int money :100
+    print (I have,!money,dollars)
 }
+#
+#
 endFile
