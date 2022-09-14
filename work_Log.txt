@@ -1,6 +1,0 @@
-9-9-22
-
-[AAC or 'Assembler And Compiler']:
-
-- Variables can now either be assigned an address or the address can be generated to save memory.
-- Variable auto currently has an issue where if before a loadAddress it messes with later declarations of labels and loadAddresses
