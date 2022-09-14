@@ -1,4 +1,19 @@
-//KernelSPE_
-//- A working kernel for the SPE_ -//
-//Author: Landon Smith
-//Date:   9/8/22
+//--------------------
+//Compiled Program
+//Compiled by: speC
+//Compiled Time: 14:0:48
+//--------------------
+jmp $256 //Start
+*= $256 //Default Compiled Program Address
+*= !__main__
+.var task55 *
+.var rx_cache *
+.var ry_cache *
+.var rt_cache *
+.var rp_cache *
+.var ru_cache *
+//
+//
+*= !__cacheRX__
+    mov x,!rx_cache
+   mov yreturn 0

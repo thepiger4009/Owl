@@ -1,13 +1,6 @@
-- 9/8/22 11:15 PM
+9-9-22
 
-Testing AAC and making sure that things are functioning, also fixing any bugs that are found and possible some additions to AAC.
+[AAC or 'Assembler And Compiler']:
 
-11:30PM:
-
-First succesfull label test ever, had to remove vb = 0 as I thought it fixed something yesterday but it actually broke the label system.
-Holy Shit.
-
-12:25 AM:
-
-Done with work on this today, I'm tired and need to go to bed.
-
+- Variables can now either be assigned an address or the address can be generated to save memory.
+- Variable auto currently has an issue where if before a loadAddress it messes with later declarations of labels and loadAddresses

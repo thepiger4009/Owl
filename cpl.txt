@@ -1,0 +1,5 @@
+# Test Compile
+mk __main__ {
+    declare task55 int
+}
+endFile

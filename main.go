@@ -27,7 +27,7 @@ var ef, mf uint8
 var hei uint8
 
 // 1 - Enable | 0 - Disable
-var debugDisplay int = 1
+var debugDisplay int = 0
 
 func main() {
 
@@ -809,13 +809,11 @@ func debugCheck() {
 		fmt.Print("\033[H\033[2J")
 		fmt.Println("RX:", rx, "RY:", ry, "RT:", rt, "RP:", rp, "RU:", ru)
 		fmt.Println("PC:", pc, "IR:", ir, "EF:", ef, "MF:", mf, "KB:", memory[65000])
-		fmt.Println(memory[260], memory[261], memory[262], memory[263], memory[264], memory[265], memory[266])
-
 	}
 }
 
 func loadRom() {
-	fmt.Println("SPE+ - Simple Processor Emulator Plus | Rom Loader")
+	fmt.Println("SPE_ - Simple Processor Emulator Plus | Rom Loader")
 	var count int = 0 //Memory Counter, place line at this memory address
 
 	//Thanks to stackoverflow and some other golang education website, Still don't understand this
