@@ -1,12 +1,8 @@
-//--------------------
-//Compiled Program
-//Compiled by: speC
-//Compiled Time: 23:55:10
-//--------------------
-jmp $256 //Start
 *= $256 //Default Compiled Program Address
 *= !main
- jsr !__cacheRX__
-  mov #100,x
-    mov x,!money
-   jsr !__retrieveRX__
+  mov #1,x
+  mov #2,y
+  mov #3,t
+  mov #4,p
+  mov #5,u
+return 0

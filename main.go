@@ -1,8 +1,8 @@
 //main.go
 /*
 Simple Processor Emulation
-Build:  1.0.1
-Date:   9-14-22
+Build:  1.0.2
+Date:   10-9-22
 Author: Landon Smith
 ----------------------------
 MIT License
@@ -30,7 +30,6 @@ SOFTWARE.
 
 package main
 
-//Modules being used
 import (
 	"bufio"
 	"fmt"
@@ -42,22 +41,37 @@ import (
 	"github.com/eiannone/keyboard"
 )
 
-var memory [65536]uint16
-var stack [256]uint16
-var rx, ry, rt, rp, ru uint16
-var ir, sp uint8
-var pc uint16 = 0
-var ef, mf uint8
-var hei uint8
+// Arrays
+var memory [65536]uint16 // Memory Array
+var stack [256]uint16    // Stack Array
 
-// 1 - Enable | 0 - Disable
-var debugDisplay int = 1
+// Registers
+var rx, ry, rt, rp, ru uint16 // General & Accumulative Registers
+var ir uint8                  // Instruction Register
 
-func main() {
+// Pointers
+var pc uint16 = 256 //Program Counter
+var sp uint8        //Stack Pointer
 
-	loadRom()
-	memory[65000] = 1
+// Flags
+var ef, mf, inf, hei byte // Equal flag, Math Flag, Interrupt Flag
 
+// Emulation Flags
+var debugDisplay byte = 1
+
+// Execution Cycle of SPE_ Core
+func cycle() {
+	debugCheck()
+	getInstruction()
+	decodeInstruction()
+}
+
+// Setup certain aspects of the SPE_
+func setup() {
+	loadRom()         // Load contents of rom.txt into Memory
+	memory[65000] = 1 // Set keyboard address to 1
+
+	// Keyboard Check function, sets address 65000 in emulation memory to value of keyboard in ascii
 	go func() {
 		for {
 			char, _, err := keyboard.GetSingleKey()
@@ -71,277 +85,235 @@ func main() {
 			if memory[65000] == 0 {
 				memory[65000] = 32
 			}
-
 		}
 	}()
 
+	// SPE_ Internal Timer Chip
+	go func() {
+		for {
+			memory[65001] += 1
+			if memory[65001] > 60 {
+				memory[65001] = 0
+			}
+		}
+	}()
+	EmulationLoop() // Let the emulation go into it's loop
+}
+
+// Main Emulation Loop of Emulator
+func EmulationLoop() {
 	for {
 		cycle()
 	}
 }
 
-func cycle() {
-	debugCheck()
-	getInstruction()
-	decodeInstruction()
+// Function Main - First to be called by Golang
+func main() {
+	setup()
 }
 
+// SPE_ Core Decoder
 func decodeInstruction() {
 	switch ir {
 	case 100:
 		switch memory[pc+1] {
 		case 1:
 			rx = memory[pc+2]
-			pc += 3
 		case 2:
 			ry = memory[pc+2]
-			pc += 3
 		case 3:
 			rt = memory[pc+2]
-			pc += 3
 		case 4:
 			rp = memory[pc+2]
-			pc += 3
 		case 5:
 			ru = memory[pc+2]
-			pc += 3
 		}
+		pc += 3
+		//---------------------------
 	case 101:
 		switch memory[pc+1] {
 		case 1:
 			rx = memory[memory[pc+2]]
-			pc += 3
 		case 2:
 			ry = memory[memory[pc+2]]
-			pc += 3
 		case 3:
 			rt = memory[memory[pc+2]]
-			pc += 3
 		case 4:
 			rp = memory[memory[pc+2]]
-			pc += 3
 		case 5:
 			ru = memory[memory[pc+2]]
-			pc += 3
 		}
+		pc += 3
 	case 102:
 		switch memory[pc+1] {
 		case 1:
 			rx = memory[memory[pc+2]+rp]
-			pc += 3
 		case 2:
 			ry = memory[memory[pc+2]+rp]
-			pc += 3
 		case 3:
 			rt = memory[memory[pc+2]+rp]
-			pc += 3
 		case 4:
 			rp = memory[memory[pc+2]+rp]
-			pc += 3
 		case 5:
 			ru = memory[memory[pc+2]+rp]
-			pc += 3
 		}
+		pc += 3
 	case 103:
 		switch memory[pc+1] {
 		case 1:
 			rx = memory[memory[pc+2]+ru]
-			pc += 3
 		case 2:
 			ry = memory[memory[pc+2]+ru]
-			pc += 3
 		case 3:
 			rt = memory[memory[pc+2]+ru]
-			pc += 3
 		case 4:
 			rp = memory[memory[pc+2]+ru]
-			pc += 3
 		case 5:
 			ru = memory[memory[pc+2]+ru]
-			pc += 3
 		}
+		pc += 3
 	case 104:
 		switch memory[pc+1] {
 		case 1:
 			memory[memory[pc+2]] = rx
-			pc += 3
 		case 2:
 			memory[memory[pc+2]] = ry
-			pc += 3
 		case 3:
 			memory[memory[pc+2]] = rt
-			pc += 3
 		case 4:
 			memory[memory[pc+2]] = rp
-			pc += 3
 		case 5:
 			memory[memory[pc+2]] = ru
-			pc += 3
 		}
+		pc += 3
 	case 105:
 		switch memory[pc+1] {
 		case 1:
 			memory[memory[pc+2]+rp] = rx
-			pc += 3
 		case 2:
 			memory[memory[pc+2]+rp] = ry
-			pc += 3
 		case 3:
 			memory[memory[pc+2]+rp] = rt
-			pc += 3
 		case 4:
 			memory[memory[pc+2]+rp] = rp
-			pc += 3
 		case 5:
 			memory[memory[pc+2]+rp] = ru
-			pc += 3
 		}
+		pc += 3
 	case 106:
 		switch memory[pc+1] {
 		case 1:
 			memory[memory[pc+2]+ru] = rx
-			pc += 3
 		case 2:
 			memory[memory[pc+2]+ru] = ry
-			pc += 3
 		case 3:
 			memory[memory[pc+2]+ru] = rt
-			pc += 3
 		case 4:
 			memory[memory[pc+2]+ru] = rp
-			pc += 3
 		case 5:
 			memory[memory[pc+2]+ru] = ru
-			pc += 3
 		}
+		pc += 3
 	case 107:
 		switch memory[pc+1] {
 		case 1:
 			rx += 1
-			pc += 2
 		case 2:
 			ry += 1
-			pc += 2
 		case 3:
 			rt += 1
-			pc += 2
 		case 4:
 			rp += 1
-			pc += 2
 		case 5:
 			ru += 1
-			pc += 2
 		}
+		pc += 2
 	case 108:
 		switch memory[pc+1] {
 		case 1:
 			rx -= 1
-			pc += 2
 		case 2:
 			ry -= 1
-			pc += 2
 		case 3:
 			rt -= 1
-			pc += 2
 		case 4:
 			rp -= 1
-			pc += 2
 		case 5:
 			ru -= 1
-			pc += 2
 		}
+		pc += 2
 	case 109:
 		switch memory[pc+1] {
 		case 1:
 			switch memory[pc+2] {
 			case 1:
 				rx = rx - 0
-				pc += 3
 			case 2:
 				ry = rx
-				pc += 3
 			case 3:
 				rt = rx
-				pc += 3
 			case 4:
 				rp = rx
-				pc += 3
 			case 5:
 				ru = rx
-				pc += 3
 			}
+			pc += 3
 		case 2:
 			switch memory[pc+2] {
 			case 1:
 				rx = ry
-				pc += 3
 			case 2:
 				ry = ry - 0
-				pc += 3
 			case 3:
 				rt = ry
-				pc += 3
 			case 4:
 				rp = ry
-				pc += 3
 			case 5:
 				ru = ry
-				pc += 3
 			}
+			pc += 3
 		case 3:
 			switch memory[pc+2] {
 			case 1:
 				rx = rt
-				pc += 3
 			case 2:
 				ry = rt
-				pc += 3
 			case 3:
 				rt = rt - 0
-				pc += 3
 			case 4:
 				rp = rt
-				pc += 3
 			case 5:
 				ru = rt
-				pc += 3
 			}
+			pc += 3
 		case 4:
 			switch memory[pc+2] {
 			case 1:
 				rx = rp
-				pc += 3
 			case 2:
 				ry = rp
-				pc += 3
 			case 3:
 				rt = rp
-				pc += 3
 			case 4:
 				rp = rp - 0
-				pc += 3
 			case 5:
 				ru = rp
-				pc += 3
 			}
+			pc += 3
 		case 5:
 			switch memory[pc+2] {
 			case 1:
 				rx = ru
-				pc += 3
 			case 2:
 				ry = ru
-				pc += 3
 			case 3:
 				rt = ru
-				pc += 3
 			case 4:
 				rp = ru
-				pc += 3
 			case 5:
 				ru = ru - 0
-				pc += 3
 			}
+			pc += 3
 		}
 	case 110:
 		pc = memory[pc+1]
@@ -364,92 +336,72 @@ func decodeInstruction() {
 			switch memory[pc+2] {
 			case 1:
 				rx = rx + rx
-				pc += 3
 			case 2:
 				ry = ry + rx
-				pc += 3
 			case 3:
 				rt = rt + rx
-				pc += 3
 			case 4:
 				rp = rp + rx
-				pc += 3
 			case 5:
 				ru = ru + rx
-				pc += 3
 			}
+			pc += 3
 		case 2:
 			switch memory[pc+2] {
 			case 1:
 				rx = rx + ry
-				pc += 3
 			case 2:
 				ry = ry + ry
-				pc += 3
 			case 3:
 				rt = rt + ry
-				pc += 3
 			case 4:
 				rp = rp + ry
-				pc += 3
 			case 5:
 				ru = ru + ry
-				pc += 3
 			}
+			pc += 3
 		case 3:
 			switch memory[pc+2] {
 			case 1:
 				rx = rx + rt
-				pc += 3
 			case 2:
 				ry = ry + rt
-				pc += 3
 			case 3:
 				rt = rt + rt
-				pc += 3
 			case 4:
 				rp = rp + rt
-				pc += 3
 			case 5:
 				ru = ru + rt
-				pc += 3
 			}
+			pc += 3
 		case 4:
 			switch memory[pc+2] {
 			case 1:
 				rx = rx + rp
-				pc += 3
 			case 2:
 				ry = ry + rp
-				pc += 3
 			case 3:
 				rt = rt + rp
-				pc += 3
 			case 4:
 				rp = rp + rp
-				pc += 3
 			case 5:
 				ru = ru + rp
-				pc += 3
 			}
+			pc += 3
 		case 5:
 			switch memory[pc+2] {
 			case 1:
 				rx = rx + ru
-				pc += 3
 			case 2:
 				ry = ry + ru
-				pc += 3
 			case 3:
 				rt = rt + ru
-				pc += 3
 			case 4:
 				rp = rp + ru
-				pc += 3
 			case 5:
 				ru = ru + ru
-				pc += 3
 			}
+			pc += 3
 		}
 	case 114:
 		switch memory[pc+1] {
@@ -457,92 +409,72 @@ func decodeInstruction() {
 			switch memory[pc+2] {
 			case 1:
 				rx = rx - rx
-				pc += 3
 			case 2:
 				ry = ry - rx
-				pc += 3
 			case 3:
 				rt = rt - rx
-				pc += 3
 			case 4:
 				rp = rp - rx
-				pc += 3
 			case 5:
 				ru = ru - rx
-				pc += 3
 			}
+			pc += 3
 		case 2:
 			switch memory[pc+2] {
 			case 1:
 				rx = rx - ry
-				pc += 3
 			case 2:
 				ry = ry - ry
-				pc += 3
 			case 3:
 				rt = rt - ry
-				pc += 3
 			case 4:
 				rp = rp - ry
-				pc += 3
 			case 5:
 				ru = ru - ry
-				pc += 3
 			}
+			pc += 3
 		case 3:
 			switch memory[pc+2] {
 			case 1:
 				rx = rx - rt
-				pc += 3
 			case 2:
 				ry = ry - rt
-				pc += 3
 			case 3:
 				rt = rt - rt
-				pc += 3
 			case 4:
 				rp = rp - rt
-				pc += 3
 			case 5:
 				ru = ru - rt
-				pc += 3
 			}
+			pc += 3
 		case 4:
 			switch memory[pc+2] {
 			case 1:
 				rx = rx - rp
-				pc += 3
 			case 2:
 				ry = ry - rp
-				pc += 3
 			case 3:
 				rt = rt - rp
-				pc += 3
 			case 4:
 				rp = rp - rp
-				pc += 3
 			case 5:
 				ru = ru - rp
-				pc += 3
 			}
+			pc += 3
 		case 5:
 			switch memory[pc+2] {
 			case 1:
 				rx = rx - ru
-				pc += 3
 			case 2:
 				ry = ry - ru
-				pc += 3
 			case 3:
 				rt = rt - ru
-				pc += 3
 			case 4:
 				rp = rp - ru
-				pc += 3
 			case 5:
 				ru = ru - ru
-				pc += 3
 			}
+			pc += 3
 		}
 	case 115:
 		switch memory[pc+1] {
@@ -595,40 +527,32 @@ func decodeInstruction() {
 		case 1:
 			stack[sp] = rx
 			sp += 1
-			pc += 2
 		case 2:
 			stack[sp] = ry
 			sp += 1
-			pc += 2
 		case 3:
 			stack[sp] = rt
 			sp += 1
-			pc += 2
 		case 4:
 			stack[sp] = rp
-			pc += 2
 		case 5:
 			stack[sp] = ru
-			pc += 2
 		}
+		pc += 2
 	case 118:
 		switch memory[pc+1] {
 		case 1:
 			rx = stack[sp]
-			pc += 2
 		case 2:
 			ry = stack[sp]
-			pc += 2
 		case 3:
 			rt = stack[sp]
-			pc += 2
 		case 4:
 			rp = stack[sp]
-			pc += 2
 		case 5:
 			ru = stack[sp]
-			pc += 2
 		}
+		pc += 2
 	case 119:
 		sp += 1
 		pc += 1
@@ -647,20 +571,16 @@ func decodeInstruction() {
 		switch memory[pc+1] {
 		case 1:
 			fmt.Print(string(rx))
-			pc += 2
 		case 2:
 			fmt.Print(string(ry))
-			pc += 2
 		case 3:
 			fmt.Print(string(rt))
-			pc += 2
 		case 4:
 			fmt.Print(string(rp))
-			pc += 2
 		case 5:
 			fmt.Print(string(ru))
-			pc += 2
 		}
+		pc += 2
 	case 125:
 		fmt.Printf("\b \b")
 		pc += 1
@@ -802,20 +722,16 @@ func decodeInstruction() {
 		switch memory[pc+1] {
 		case 1:
 			fmt.Print(rx)
-			pc += 2
 		case 2:
 			fmt.Print(ry)
-			pc += 2
 		case 3:
 			fmt.Print(rt)
-			pc += 2
 		case 4:
 			fmt.Print(rp)
-			pc += 2
 		case 5:
 			fmt.Print(ru)
-			pc += 2
 		}
+		pc += 2
 	case 132:
 		fmt.Print("\033[H\033[2J")
 		pc += 1
