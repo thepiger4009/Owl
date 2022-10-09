@@ -1,5 +1,5 @@
-# SPE_
-SPE_ or 'Simple Processor Emulation' is a emulated processor which runs simple. It currently lacks certain qualities of real processors and still needs work but it should get better over time.
+# Overview
+SPE_ is an emulated computer system running my emulated processor called 'SPE_'. It is currently in early development and will include issues, bugs, and missing features. This project is meant for fun and teaching my self on assembly including on how a processor deals with a system.
 
 # Features:
 Five 16-bit Index/Accumulator Registers
