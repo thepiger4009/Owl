@@ -1,8 +1,8 @@
 //main.go
 /*
 Simple Processor Emulation
-Build:  1.0.2
-Date:   10-9-22
+Build:  1.0.3
+Date:   10-10-22
 Author: Landon Smith
 ----------------------------
 MIT License
@@ -97,6 +97,7 @@ func setup() {
 			}
 		}
 	}()
+
 	EmulationLoop() // Let the emulation go into it's loop
 }
 

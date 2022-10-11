@@ -1,8 +1,0 @@
-*= $256 //Default Compiled Program Address
-*= !main
-  mov #1,x
-  mov #2,y
-  mov #3,t
-  mov #4,p
-  mov #5,u
-return 0
