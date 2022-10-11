@@ -1,8 +1,8 @@
 //main.go
 /*
 Simple Processor Emulation
-Build:  1.0.3
-Date:   10-10-22
+Build:  1.0.4
+Date:   10-11-22
 Author: Landon Smith
 ----------------------------
 MIT License

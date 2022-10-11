@@ -1,0 +1,30 @@
+//--------------------
+//Compiled Program
+//Compiled by: speC
+//Compiled Time: 14:53:6
+//--------------------
+//Start
+*= $256 //Default Compiled Program Address
+*= !main
+mov #0,x
+mov x,!key
+//StartOfFor
+*= !forLoop0
+//IF-STATEMENT
+mov $65000,x
+mov x,!key
+mov !key,y
+cmp y,#116
+bne !AfterIf0
+beq !doIf0
+*= !doIf0
+mov #555,x
+mov x,!key
+mov #0,x
+mov x,$65000
+*= !AfterIf0
+//ENDIFSTATEMENT
+jmp !forLoop0
+//EndOfFor
+.var key *
+return 0
