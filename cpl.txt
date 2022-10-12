@@ -1,20 +1,4 @@
-//speC.py Test
-//MPPL - Multi Purpose Programming Language
-//
 make main() {
-    declare key int := 0
-    /* StartOfFor
-    for {
-        /* IF-STATEMENT
-        int key := $65000
-        if !key = 116 {
-            int key := 555
-            address 65000 := 1
-        endIf
-        /* ENDIFSTATEMENT
-        }
-    endFor
-    /* EndOfFor   
-    }
+
 }
-return 0
+

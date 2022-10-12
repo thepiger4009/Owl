@@ -145,6 +145,9 @@ while 1:
 	if fullLine[0] == "dsp":
 		vb+=1
 
+	if fullLine[0] == "dsn": # display nothing
+		vb+=1
+
 	if fullLine[0] == "ehi":
 		vb+=1
 
@@ -760,6 +763,9 @@ while 1:
 
 	if fullLine[0] == "dbk": # Display Backspace
 		rom.write("125\n")
+
+	if fullLine[0] == "dsn": # Display nothing
+		rom.write("133\n")
 
 	if fullLine[0] == "dcs": # Display clear
 		rom.write("132\n")

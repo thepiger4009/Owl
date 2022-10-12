@@ -57,7 +57,7 @@ var sp uint8        //Stack Pointer
 var ef, mf, inf, hei byte // Equal flag, Math Flag, Interrupt Flag
 
 // Emulation Flags
-var debugDisplay byte = 1
+var debugDisplay byte = 0
 
 // Execution Cycle of SPE_ Core
 func cycle() {
@@ -735,6 +735,9 @@ func decodeInstruction() {
 		pc += 2
 	case 132:
 		fmt.Print("\033[H\033[2J")
+		pc += 1
+	case 133: //Print Nothing, basically a space
+		fmt.Print(" ")
 		pc += 1
 	case 150:
 		pc += 2
