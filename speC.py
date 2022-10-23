@@ -38,6 +38,16 @@ n = localtime()
 asm.write("//--------------------\n//Compiled Program\n//Compiled by: speC\n//Compiled Time: "),asm.write(str(n[3])),asm.write(":"),asm.write(str(n[4])),asm.write(":"),asm.write(str(n[5])),asm.write("\n//--------------------")
 asm.write("\n//Start\n*= $256 //Default Compiled Program Address\n")
 
+# Filter function
+def filterString(inputString,word):
+    filterString = inputString.split()
+    for x in range(len(filterString)):
+        if filterString[x] == word:
+            next
+        else:
+            finalString = finalString + filterString[x]
+        return finalString
+
 
 lc=1
 ifc = 0  # IF COUNTER
@@ -68,6 +78,7 @@ while True:
                     asm.write("mov x,!"+name+str(x)+"\n")
 
     if fullLine[0] == "if":
+            
         if "&" in fullLine[1]:
             arrayName = fullLine[1].split("&"[0])
             type = (''.join(x for x in fullLine[1] if x.isdigit()))
@@ -203,16 +214,26 @@ while True:
     if fullLine[0] == "backspace":
         asm.write("dbk\n")
 
+    if fullLine[0] == "while":
 
 
     if fullLine[0] == "for":
-        if "!" in fullLine[1]: # VAR NEEDS WORK
-            next 
+        if "!" in fullLine[1]:
+            FORvar = fullLine[1].split("!"[0])
+            if fullLine[2] == "to":
+                if "!" in fullLine[3]:
+                    next   # VAR NEEDS WORKED ON
+                else:
+                    FORnum = fullLine[3]
+                    asm.write("mov #0,p\n*= !forLoop"+str(forc)+"\nmov !"+FORvar[1]+",t\ninc p\n")
+
         else:
             asm.write("*= !forLoop"+str(forc)+"\n")
 
     if fullLine[0] == "endFor":
-        asm.write("jmp !forLoop"+str(forc)+"\n")
+        n = int(FORnum) - 1
+        asm.write("cmp t,#"+str(n)+"\nbeq !afterFor"+str(forc)+"\nmov p,!"+FORvar[1]+"\nbne !forLoop"+str(forc)+"\n")
+        asm.write("*= !afterFor"+str(forc)+"\n")
         forc+=1
 
     if fullLine[0] == "/*":

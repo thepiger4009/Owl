@@ -1,8 +1,8 @@
 //main.go
 /*
 Simple Processor Emulation
-Build:  1.0.4
-Date:   10-11-22
+Build:  1.0.5
+Date:   10-12-22
 Author: Landon Smith
 ----------------------------
 MIT License
@@ -57,7 +57,7 @@ var sp uint8        //Stack Pointer
 var ef, mf, inf, hei byte // Equal flag, Math Flag, Interrupt Flag
 
 // Emulation Flags
-var debugDisplay byte = 0
+var debugDisplay byte = 1
 
 // Execution Cycle of SPE_ Core
 func cycle() {
