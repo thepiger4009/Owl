@@ -1,8 +1,459 @@
-//Main.speC
-//Date: 10-12-22
-//Author: Landon Smith
+//speC kernel test environment
+//Build: 1.0
+//Date: 10/22/22
+//
 //
 //
 make main() {
-    
+    //
+    //Welcome Message
+    println Welcome to the developmental kernel for the 'SPE_'
+    println Build: 1.0 10/22/22
+    //
+    //
+    //Setting up user info
+    println [USER INFO SETUP]
+    declare UserID int := 1      //User 1 is main
+    declare Version int := 1     //Kernel Version Data
+    declare UsersActive int := 1 //Amount of active users
+    do doneMessage
+    //
+    //
+    //Setting up keyboard information
+    println [KEYBOARD INFO SETUP]
+    declare key int := 1
+    declare keyCachePointer int := 0
+    declare keyCache array[25] := 0
+    do doneMessage
+    //
+    //
+    //Setting up boot info
+    println [BOOT INFO SETUP]
+    declare seenBootMessage int := 0
+    decalre hasBooted int := 0
+    do doneMessage
+    do Loop
+end
 }
+make Loop() {
+    //Main Execution Loop
+    //Check if user has seen boot doneMessage
+    if !seenBootMessage = 0 {
+        println 
+        println Welcome to the SPE_ Kernel/Os! Type `Help` for more...
+        int seenBootMessage := 1
+    endIf
+    //
+    //Lets get input from the keyboard
+    do keyTask
+    do Loop
+end
+}
+//
+//
+make doneMessage() {
+    println [GOOD]
+end
+}
+//
+make keyTask() {
+    int key := $65000
+    do keyCheck
+end
+}
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+make keyCacheCheck() {
+    if &keyCache0 = @a {
+        println pressed a
+        do asmCheck1
+    endIf
+    }
+end
+}
+//
+make asmCheck1() {
+    if &keyCache1 = @s {
+        println pressed s
+        do asmCheck2
+    endIf
+    }
+end
+}
+make asmCheck2() {
+    if &keyCache2 = @m {
+        println pressed m
+        do asmMode
+    endIf
+    }
+end
+}
+//
+//
+//THE NATIVE ASM WRITING TOOL
+make asmMode() {
+    println Native Assembler 1.0
+end
+}
+make nothingFoundErrorMessage() {
+    println Error: Not Command, or issue with kernel.
+end
+}
+//
+//
+make resetKeyCache() {
+    array[0] keyCache := 0
+    array[1] keyCache := 0
+    array[2] keyCache := 0
+    array[3] keyCache := 0
+    array[4] keyCache := 0
+    array[5] keyCache := 0
+    array[6] keyCache := 0
+    array[7] keyCache := 0
+    array[8] keyCache := 0
+    array[9] keyCache := 0
+    array[10] keyCache := 0
+    array[11] keyCache := 0
+    array[12] keyCache := 0
+    array[13] keyCache := 0
+    array[14] keyCache := 0
+    array[15] keyCache := 0
+    array[16] keyCache := 0
+    array[17] keyCache := 0
+    array[18] keyCache := 0
+    array[19] keyCache := 0
+    array[20] keyCache := 0
+    array[21] keyCache := 0
+    array[22] keyCache := 0
+    array[23] keyCache := 0
+    array[24] keyCache := 0
+end
+}
+//
+//
+//
+// KEY CACHER TASK FOR OUR Kernel
+// WHEN CALLED WILL STORE A KEY IN CACHE
+// RESET ON ENTER CALL
+make key_pressed() {
+    if !keyCachePointer = 0 {
+        array[0] keyCache := !key
+        int keyCachePointer := 1
+    endIf  
+    }
+    if !keyCachePointer = 1 {
+        array[1] keyCache := !key
+        int keyCachePointer := 2
+    endIf  
+    }
+    if !keyCachePointer = 2 {
+        array[2] keyCache := !key
+        int keyCachePointer := 3
+    endIf  
+    }
+    if !keyCachePointer = 3 {
+        array[3] keyCache := !key
+        int keyCachePointer := 4
+    endIf  
+    }
+    if !keyCachePointer = 4 {
+        array[4] keyCache := !key
+        int keyCachePointer := 5
+    endIf  
+    }
+    if !keyCachePointer = 5 {
+        array[5] keyCache := !key
+        int keyCachePointer := 6
+    endIf  
+    }
+    if !keyCachePointer = 6 {
+        array[6] keyCache := !key
+        int keyCachePointer := 7
+    endIf  
+    }
+    if !keyCachePointer = 7 {
+        array[7] keyCache := !key
+        int keyCachePointer := 8
+    endIf  
+    }
+    if !keyCachePointer = 8 {
+        array[8] keyCache := !key
+        int keyCachePointer := 9
+    endIf  
+    }
+    if !keyCachePointer = 9 {
+        array[9] keyCache := !key
+        int keyCachePointer := 10
+    endIf  
+    }
+    if !keyCachePointer = 10 {
+        array[10] keyCache := !key
+        int keyCachePointer := 11
+    endIf  
+    }
+    if !keyCachePointer = 11 {
+        array[11] keyCache := !key
+        int keyCachePointer := 12
+    endIf  
+    }
+    if !keyCachePointer = 12 {
+        array[12] keyCache := !key
+        int keyCachePointer := 13
+    endIf  
+    }
+    if !keyCachePointer = 13 {
+        array[13] keyCache := !key
+        int keyCachePointer := 14
+    endIf  
+    }
+    if !keyCachePointer = 14 {
+        array[14] keyCache := !key
+        int keyCachePointer := 15
+    endIf  
+    }
+    if !keyCachePointer = 15 {
+        array[15] keyCache := !key
+        int keyCachePointer := 16
+    endIf  
+    }
+    if !keyCachePointer = 16 {
+        array[16] keyCache := !key
+        int keyCachePointer := 17
+    endIf  
+    }
+    if !keyCachePointer = 17 {
+        array[17] keyCache := !key
+        int keyCachePointer := 18
+    endIf  
+    }
+    if !keyCachePointer = 18 {
+        array[18] keyCache := !key
+        int keyCachePointer := 19
+    endIf  
+    }
+    if !keyCachePointer = 19 {
+        array[19] keyCache := !key
+        int keyCachePointer := 20
+    endIf  
+    }
+    if !keyCachePointer = 20 {
+        array[20] keyCache := !key
+        int keyCachePointer := 21
+    endIf  
+    }
+    if !keyCachePointer = 21 {
+        array[21] keyCache := !key
+        int keyCachePointer := 22
+    endIf  
+    }
+    if !keyCachePointer = 22 {
+        array[22] keyCache := !key
+        int keyCachePointer := 23
+    endIf  
+    }
+    if !keyCachePointer = 23 {
+        array[23] keyCache := !key
+        int keyCachePointer := 24
+    endIf  
+    }
+    if !keyCachePointer = 24 {
+        array[24] keyCache := !key
+        int keyCachePointer := 1
+    endIf  
+    }
+end
+}
+//
+make keyCheck() {
+    if !key = 47 {
+        address 65000 := 1
+        do keyCacheCheck
+    endIf
+    }
+    if !key = 96 {
+        backspace
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = 32 {
+        printsp
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @q {
+        printns q
+        address 65000 := 1
+        do key_pressed
+    endIf   
+    }
+    if !key = @w {
+        printns w
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @e {
+        printns e
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @r {
+        printns r
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @t {
+        printns t
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @y {
+        printns y
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @u {
+        printns u
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @i {
+        printns i
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @o {
+        printns o
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @p {
+        printns p
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @a {
+        printns a
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @s {
+        printns s
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @d {
+        printns d
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @f {
+        printns f
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @g {
+        printns g
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @h {
+        printns h
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @j {
+        printns j
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @k {
+        printns k
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @l {
+        printns l
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @z {
+        printns z
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @x {
+        printns x
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @c {
+        printns c
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @v {
+        printns v
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @b {
+        printns b
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }  
+    if !key = @n {
+        printns n
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+    if !key = @m {
+        printns m
+        address 65000 := 1
+        do key_pressed
+    endIf
+    }
+end
+}
+return 0

@@ -28,6 +28,8 @@ from os import system
 from linecache import getline
 from time import localtime
 
+from pyparsing import Char
+
 #Files
 asm = open("asm.txt","w+")
 
@@ -51,8 +53,10 @@ def filterString(inputString,word):
 
 lc=1
 ifc = 0  # IF COUNTER
+mifc = 0 #Multiple if Counter
 forc = 0 # FOR COUNTER
 firstIFc = 0 # First If Counter, USED IF DETECTED MULTIPLE
+ifCounter = 0
 
 while True:
     line = getline("cpl.txt",lc).rstrip("\n")
@@ -78,11 +82,25 @@ while True:
                     asm.write("mov x,!"+name+str(x)+"\n")
 
     if fullLine[0] == "if":
+        
             
         if "&" in fullLine[1]:
             arrayName = fullLine[1].split("&"[0])
             type = (''.join(x for x in fullLine[1] if x.isdigit()))
-            asm.write("mov !"+varName[1]+type+"\n")
+            asm.write("mov !"+arrayName[1]+",y\n")
+
+            if fullLine[2] == "=":
+                von = fullLine[3] # VARIABLE OR NUMBER
+                if "!" in von:
+                    next
+                elif "@" in von:
+                    character = von.split("@"[0])
+                    asm.write("cmp y,#"+str(ord(character[1]))+"\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
+                    asm.write("*= !doIf"+str(ifc)+"\n")
+                else:
+                    asm.write("cmp y,#"+von+"\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
+                    asm.write("*= !doIf"+str(ifc)+"\n")
+
 
         if "!" in fullLine[1]:
             varName = fullLine[1].split("!"[0])
@@ -93,92 +111,19 @@ while True:
                     next
                 elif "@" in von:
                     character = von.split("@"[0])
-                    match character[1]:
-                        case "q":
-                            asm.write("cmp y,#113\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "w":
-                            asm.write("cmp y,#119\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "e":
-                            asm.write("cmp y,#101\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "r":
-                            asm.write("cmp y,#114\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "t":
-                            asm.write("cmp y,#116\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "y":
-                            asm.write("cmp y,#121\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "u":
-                            asm.write("cmp y,#117\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "i":
-                            asm.write("cmp y,#105\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "o":
-                            asm.write("cmp y,#111\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "p":
-                            asm.write("cmp y,#112\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "a":
-                            asm.write("cmp y,#97\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "s":
-                            asm.write("cmp y,#115\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "d":
-                            asm.write("cmp y,#100\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "f":
-                            asm.write("cmp y,#102\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "g":
-                            asm.write("cmp y,#103\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "h":
-                            asm.write("cmp y,#104\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "j":
-                            asm.write("cmp y,#106\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "k":
-                            asm.write("cmp y,#107\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "l":
-                            asm.write("cmp y,#108\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "z":
-                            asm.write("cmp y,#122\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "x":
-                            asm.write("cmp y,#120\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "c":
-                            asm.write("cmp y,#99\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "v":
-                            asm.write("cmp y,#118\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "b":
-                            asm.write("cmp y,#98\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "n":
-                            asm.write("cmp y,#110\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
-                        case "m":
-                            asm.write("cmp y,#109\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
-                            asm.write("*= !doIf"+str(ifc)+"\n")
+                    sc = Char(character[1])
+                    asm.write("cmp y,#"+str(ord(character[1]))+"\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
+                    asm.write("*= !doIf"+str(ifc)+"\n")
                 else:
                     asm.write("cmp y,#"+von+"\nbne !AfterIf"+str(ifc)+"\nbeq !doIf"+str(ifc)+"\n")
                     asm.write("*= !doIf"+str(ifc)+"\n")
 
     if fullLine[0] == "endIf":
-        asm.write("*= !AfterIf"+str(ifc)+"\n")
+        asm.write("*= !AfterIf"+str(ifc+ifCounter)+"\n")
         ifc+=1
+# if @array[1] to 50 = @lodon
+
+
 
     if fullLine[0] == "int":
         name = fullLine[1]
@@ -214,7 +159,6 @@ while True:
     if fullLine[0] == "backspace":
         asm.write("dbk\n")
 
-    if fullLine[0] == "while":
 
 
     if fullLine[0] == "for":

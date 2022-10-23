@@ -1,8 +1,8 @@
 //main.go
 /*
 Simple Processor Emulation
-Build:  1.0.5
-Date:   10-12-22
+Build:  1.0.6
+Date:   10-22-22
 Author: Landon Smith
 ----------------------------
 MIT License
@@ -39,8 +39,9 @@ import (
 	"time"
 
 	"github.com/eiannone/keyboard"
+	"github.com/faiface/beep"
 )
-
+beep.func //REMOVE THIS
 // Arrays
 var memory [65536]uint16 // Memory Array
 var stack [256]uint16    // Stack Array
@@ -57,11 +58,12 @@ var sp uint8        //Stack Pointer
 var ef, mf, inf, hei byte // Equal flag, Math Flag, Interrupt Flag
 
 // Emulation Flags
-var debugDisplay byte = 1
+var debugDisplay byte = 0
+var cycles int = 0 //Used every now and then.
+var debugLast byte = 0
 
 // Execution Cycle of SPE_ Core
 func cycle() {
-	debugCheck()
 	getInstruction()
 	decodeInstruction()
 }
@@ -82,6 +84,15 @@ func setup() {
 			if memory[65000] == 92 {
 				os.Exit(4)
 			}
+			if memory[65000] == 95 {
+				switch debugDisplay {
+				case 1:
+					debugDisplay = 0
+					fmt.Print("\033[H\033[2J")
+				case 0:
+					debugDisplay = 1
+				}
+			}
 			if memory[65000] == 0 {
 				memory[65000] = 32
 			}
@@ -94,6 +105,17 @@ func setup() {
 			memory[65001] += 1
 			if memory[65001] > 60 {
 				memory[65001] = 0
+			}
+		}
+	}()
+
+	//DebugDisplay
+	go func() {
+		for {
+			if debugDisplay == 1 {
+				fmt.Print("\033[H\033[2J")
+				fmt.Println("RX:", rx, "RY:", ry, "RT:", rt, "RP:", rp, "RU:", ru)
+				fmt.Println("PC:", pc, "IR:", ir, "EF:", ef, "MF:", mf, "KB:", memory[65000])
 			}
 		}
 	}()
@@ -746,14 +768,6 @@ func decodeInstruction() {
 
 func getInstruction() {
 	ir = uint8(memory[pc])
-}
-
-func debugCheck() {
-	if debugDisplay == 1 {
-		fmt.Print("\033[H\033[2J")
-		fmt.Println("RX:", rx, "RY:", ry, "RT:", rt, "RP:", rp, "RU:", ru)
-		fmt.Println("PC:", pc, "IR:", ir, "EF:", ef, "MF:", mf, "KB:", memory[65000])
-	}
 }
 
 func loadRom() {
