@@ -1,8 +1,8 @@
 //main.go
 /*
-Simple Processor Emulation
-Build:  1.0.6
-Date:   10-22-22
+Hawk (Hope all will know)
+Build:  1.0.7
+Date:   10-26-22
 Author: Landon Smith
 ----------------------------
 MIT License
@@ -36,22 +36,22 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/eiannone/keyboard"
-	"github.com/faiface/beep"
 )
-beep.func //REMOVE THIS
+
 // Arrays
-var memory [65536]uint16 // Memory Array
-var stack [256]uint16    // Stack Array
+var memory [524288]uint32 // 512KB 32-bit Memory Array
+var stack [256]uint32     // 256 Byte 32-bit Stack Array
 
 // Registers
-var rx, ry, rt, rp, ru uint16 // General & Accumulative Registers
-var ir uint8                  // Instruction Register
+var rx, ry, rt, rp, ru uint32 // 32-bit General & Accumulative Registers
+var ir uint8                  // 8-bit Instruction Register
 
 // Pointers
-var pc uint16 = 256 //Program Counter
+var pc uint32 = 256 //Program Counter
 var sp uint8        //Stack Pointer
 
 // Flags
@@ -62,16 +62,16 @@ var debugDisplay byte = 0
 var cycles int = 0 //Used every now and then.
 var debugLast byte = 0
 
-// Execution Cycle of SPE_ Core
+// Execution Cycle of Hawk Core
 func cycle() {
 	getInstruction()
 	decodeInstruction()
 }
 
-// Setup certain aspects of the SPE_
+// Setup certain aspects of the Hawk
 func setup() {
-	loadRom()         // Load contents of rom.txt into Memory
-	memory[65000] = 1 // Set keyboard address to 1
+	loadRom()          // Load contents of rom.txt into Memory
+	memory[524287] = 1 // Set keyboard address to 1
 
 	// Keyboard Check function, sets address 65000 in emulation memory to value of keyboard in ascii
 	go func() {
@@ -80,11 +80,11 @@ func setup() {
 			if err != nil {
 				panic(err)
 			}
-			memory[65000] = uint16(char)
-			if memory[65000] == 92 {
+			memory[524287] = uint32(char)
+			if memory[524287] == 92 {
 				os.Exit(4)
 			}
-			if memory[65000] == 95 {
+			if memory[524287] == 95 {
 				switch debugDisplay {
 				case 1:
 					debugDisplay = 0
@@ -93,8 +93,8 @@ func setup() {
 					debugDisplay = 1
 				}
 			}
-			if memory[65000] == 0 {
-				memory[65000] = 32
+			if memory[524287] == 0 {
+				memory[524287] = 32
 			}
 		}
 	}()
@@ -102,9 +102,9 @@ func setup() {
 	// SPE_ Internal Timer Chip
 	go func() {
 		for {
-			memory[65001] += 1
-			if memory[65001] > 60 {
-				memory[65001] = 0
+			memory[524286] += 1
+			if memory[524286] > 60 {
+				memory[524286] = 0
 			}
 		}
 	}()
@@ -115,7 +115,7 @@ func setup() {
 			if debugDisplay == 1 {
 				fmt.Print("\033[H\033[2J")
 				fmt.Println("RX:", rx, "RY:", ry, "RT:", rt, "RP:", rp, "RU:", ru)
-				fmt.Println("PC:", pc, "IR:", ir, "EF:", ef, "MF:", mf, "KB:", memory[65000])
+				fmt.Println("PC:", pc, "IR:", ir, "EF:", ef, "MF:", mf, "KB:", memory[524287])
 			}
 		}
 	}()
@@ -132,10 +132,11 @@ func EmulationLoop() {
 
 // Function Main - First to be called by Golang
 func main() {
+	fmt.Println("Hawk(Hope All Will Know) Virtual Machine | Version 1.0.7")
 	setup()
 }
 
-// SPE_ Core Decoder
+// Hawk Core Decoder
 func decodeInstruction() {
 	switch ir {
 	case 100:
@@ -771,11 +772,13 @@ func getInstruction() {
 }
 
 func loadRom() {
-	fmt.Println("SPE_ - Simple Processor Emulator Plus | Rom Loader")
+	fmt.Println("Hawk (Hope all will know) | Rom Loader")
 	var count int = 0 //Memory Counter, place line at this memory address
 
 	//Thanks to stackoverflow and some other golang education website, Still don't understand this
-	f, err := os.Open("rom.txt")
+	file := os.Args[1:]
+	ffile := strings.Join(file, " ")
+	f, err := os.Open(ffile)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -792,16 +795,16 @@ func loadRom() {
 			line := scanner.Text()
 			linec, _ := strconv.Atoi(line)
 			count = linec
-			fmt.Println("loadAddress Found: Given address", linec, "now count is:", count)
+			fmt.Println("Setting as", linec, "| Set!:", count)
 
 		} else {
 			line2, _ := strconv.Atoi(line)
-			memory[count] = uint16(line2)
-			fmt.Println("line written: Given line *", line2, "* now memory[count] is *", memory[count], "*, count is now", count+1)
+			memory[count] = uint32(line2)
+			fmt.Println("Writing *", line2, "* | Written:", memory[count], "*, | Moving onto next", count+1)
 			count += 1
 		}
 	}
-	fmt.Println("Finished, 1 seconds until start...")
+	fmt.Println("Hawk (Hope all will know) | Init.")
 	time.Sleep(1 * time.Second)
 	fmt.Print("\033[H\033[2J")
 	f.Close()
