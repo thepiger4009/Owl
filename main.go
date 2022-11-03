@@ -1,8 +1,8 @@
 //main.go
 /*
-Hawk (Hope all will know)
-Build:  1.0.7
-Date:   10-26-22
+Owl Virtual Machine
+Build:  1.1.0
+Date:   11-2-22
 Author: Landon Smith
 ----------------------------
 MIT License
@@ -59,7 +59,6 @@ var ef, mf, inf, hei byte // Equal flag, Math Flag, Interrupt Flag
 
 // Emulation Flags
 var debugDisplay byte = 0
-var cycles int = 0 //Used every now and then.
 var debugLast byte = 0
 
 // Execution Cycle of Hawk Core
@@ -73,7 +72,7 @@ func setup() {
 	loadRom()          // Load contents of rom.txt into Memory
 	memory[524287] = 1 // Set keyboard address to 1
 
-	// Keyboard Check function, sets address 65000 in emulation memory to value of keyboard in ascii
+	// Keyboard Check function, sets address 524287 in emulation memory to value of keyboard in ascii
 	go func() {
 		for {
 			char, _, err := keyboard.GetSingleKey()
@@ -132,7 +131,6 @@ func EmulationLoop() {
 
 // Function Main - First to be called by Golang
 func main() {
-	fmt.Println("Hawk(Hope All Will Know) Virtual Machine | Version 1.0.7")
 	setup()
 }
 
@@ -584,11 +582,14 @@ func decodeInstruction() {
 		sp -= 1
 		pc += 1
 	case 121:
-		hei = 1
-		pc += 1
-	case 122:
-		hei = 0
-		pc += 1
+		switch memory[pc+1] {
+		case 1:
+			hei = 1
+			pc += 2
+		case 0:
+			hei = 0
+			pc += 2
+		}
 	case 123:
 		pc += 1
 	case 124: //WRITE OUT REGISTER TO DISPLAY
@@ -762,8 +763,6 @@ func decodeInstruction() {
 	case 133: //Print Nothing, basically a space
 		fmt.Print(" ")
 		pc += 1
-	case 150:
-		pc += 2
 	}
 }
 
@@ -772,7 +771,7 @@ func getInstruction() {
 }
 
 func loadRom() {
-	fmt.Println("Hawk (Hope all will know) | Rom Loader")
+	fmt.Println("Owl | Rom Loader")
 	var count int = 0 //Memory Counter, place line at this memory address
 
 	//Thanks to stackoverflow and some other golang education website, Still don't understand this
@@ -804,7 +803,7 @@ func loadRom() {
 			count += 1
 		}
 	}
-	fmt.Println("Hawk (Hope all will know) | Init.")
+	fmt.Println("Owl | Init.")
 	time.Sleep(1 * time.Second)
 	fmt.Print("\033[H\033[2J")
 	f.Close()
