@@ -1,5 +1,0 @@
-make main() {
-    println Hawk
-end
-}
-return 0
