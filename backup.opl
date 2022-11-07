@@ -1,0 +1,310 @@
+make setupInput() {
+    declare key int := 0
+    declare keyPress int := 0
+    declare keyCount int := 0
+    declare word array[40] := 0
+    do inputLoop  
+};
+make inputLoop() {
+    int key := $524287
+    if !key = @q {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @w {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @e {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @r {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @t {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @y {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @u {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @i {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @o {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @p {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @a {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @s {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @d {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @f {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @g {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @h {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @j {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @k {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @l {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @z {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @x {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @c {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @v {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @b {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @n {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @m {
+        int key := 0
+        int keyPress := $524287
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @` {
+        int key := 0
+        int keyPress := 32
+        int keyCount := - 1
+        address 524287 := 0
+        do cacheKey
+    };;
+    if !key = @| {
+    /* _____________________CODE_HERE
+
+    /* _____________________CODE_HERE
+    };;
+    _dcs
+    _mov !keyPress,x
+    _dra x
+    
+    do inputLoop
+};
+make cacheKey() {
+    if !keyCount = 0 {
+        array[0] word := !keyPress
+    };;
+    if !keyCount = 1 {
+        array[1] word := !keyPress
+    };;
+    if !keyCount = 2 {
+        array[2] word := !keyPress
+    };;
+    if !keyCount = 3 {
+        array[3] word := !keyPress
+    };;
+    if !keyCount = 4 {
+        array[4] word := !keyPress
+    };;
+    if !keyCount = 5 {
+        array[5] word := !keyPress
+    };;
+    if !keyCount = 6 {
+        array[6] word := !keyPress
+    };;
+    if !keyCount = 7 {
+        array[7] word := !keyPress
+    };;
+    if !keyCount = 8 {
+        array[8] word := !keyPress
+    };;
+    if !keyCount = 9 {
+        array[9] word := !keyPress
+    };;
+    if !keyCount = 10 {
+        array[10] word := !keyPress
+    };;
+    if !keyCount = 11 {
+        array[11] word := !keyPress
+    };;
+    if !keyCount = 12 {
+        array[12] word := !keyPress
+    };;
+    if !keyCount = 13 {
+        array[13] word := !keyPress
+    };;
+    if !keyCount = 14 {
+        array[14] word := !keyPress
+    };;
+    if !keyCount = 15 {
+        array[15] word := !keyPress
+    };;
+    if !keyCount = 16 {
+        array[16] word := !keyPress
+    };;
+    if !keyCount = 17 {
+        array[17] word := !keyPress
+    };;
+    if !keyCount = 18 {
+        array[18] word := !keyPress
+    };;
+    if !keyCount = 19 {
+        array[19] word := !keyPress
+    };;
+    if !keyCount = 20 {
+        array[20] word := !keyPress
+    };;
+    if !keyCount = 21 {
+        array[21] word := !keyPress
+    };;
+    if !keyCount = 22 {
+        array[22] word := !keyPress
+    };;
+    if !keyCount = 23 {
+        array[23] word := !keyPress
+    };;
+    if !keyCount = 24 {
+        array[24] word := !keyPress
+    };;
+    if !keyCount = 25 {
+        array[25] word := !keyPress
+    };;
+    if !keyCount = 26 {
+        array[26] word := !keyPress
+    };;
+    if !keyCount = 27 {
+        array[27] word := !keyPress
+    };;
+    if !keyCount = 28 {
+        array[28] word := !keyPress
+    };;
+    if !keyCount = 29 {
+        array[29] word := !keyPress
+    };;
+    if !keyCount = 30 {
+        array[30] word := !keyPress
+    };;
+    if !keyCount = 31 {
+        array[31] word := !keyPress
+    };;
+    if !keyCount = 32 {
+        array[32] word := !keyPress
+    };;
+    if !keyCount = 33 {
+        array[33] word := !keyPress
+    };;
+    if !keyCount = 34 {
+        array[34] word := !keyPress
+    };;
+    if !keyCount = 35 {
+        array[35] word := !keyPress
+    };;
+    if !keyCount = 36 {
+        array[36] word := !keyPress
+    };;
+    if !keyCount = 37 {
+        array[37] word := !keyPress
+    };;
+    if !keyCount = 38 {
+        array[38] word := !keyPress
+    };;
+    if !keyCount = 39 {
+        array[39] word := !keyPress
+    };;
+    int keyCount := + 1
+    if !keyCount = 40 {
+        int keyCount := 0
+    };;
+};
+return 0

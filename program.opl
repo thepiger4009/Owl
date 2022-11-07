@@ -1,0 +1,7 @@
+make main() {
+    if input = hello {
+        declare x int := 0
+    };;
+};;
+
+return 0
