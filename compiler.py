@@ -37,7 +37,7 @@ n = localtime()
 
 #Init Write
 asm.write("//--------------------\n//Compiled Program\n//Compiled Time: "),asm.write(str(n[3])),asm.write(":"),asm.write(str(n[4])),asm.write(":"),asm.write(str(n[5])),asm.write("\n//--------------------")
-asm.write("\n//Start\n*= $256 //Default Compiled Program Address\n")
+asm.write("\n//Start\n*= $1024\n")
 
 # Filter function
 def filterString(inputString,word):
@@ -198,7 +198,8 @@ while True:
                 address = von.split("$"[0])
                 asm.write("mov $"+str(address[1])+",x\nmov x,!"+name+"\n")
             elif "#" in von:
-                asm.write("mov #"+str(von)+",x\n")
+                num=von.split("#"[0])
+                asm.write("mov #"+str(num[1])+",x\n")
                 try:
                     if fullLine[4] == "t":
                         next
@@ -270,6 +271,14 @@ while True:
     if fullLine[0] == "do":
         functionGiven = fullLine[1]
         asm.write("jsr !"+functionGiven+"\n")
+
+    if fullLine[0] == "go":
+        if "$" in fullLine[1]:
+            address=fullLine[1].split("$"[0])
+            asm.write("jmp $"+address[1]+"\n")
+        else:
+            functionGiven = fullLine[1]
+            asm.write("jmp !"+functionGiven+"\n")
 
     if fullLine[0] == "};":
         asm.write("rts\n")

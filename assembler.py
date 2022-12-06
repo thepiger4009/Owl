@@ -1077,6 +1077,8 @@ while 1:
 			rom.write("32\n")
 			tcc+=1
 
+	
+
 
 
 
@@ -1113,3 +1115,4 @@ while 1:
 	lc+=1
 	if line == "return 0":
 		break
+print("[Assembler]: Total Bytes:",vb)

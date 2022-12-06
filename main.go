@@ -1,8 +1,8 @@
 //main.go
 /*
 Owl Virtual Machine
-Build:  1.1.0
-Date:   11-2-22
+Build:  1.1.4
+Date:   12-5-22
 Author: Landon Smith
 ----------------------------
 MIT License
@@ -44,36 +44,45 @@ import (
 
 // Arrays
 var memory [524288]uint32 // 512KB 32-bit Memory Array
-var stack [256]uint32     // 256 Byte 32-bit Stack Array
 
-// Registers
-var rx, ry, rt, rp, ru uint32 // 32-bit General & Accumulative Registers
-var ir uint8                  // 8-bit Instruction Register
+type core struct { //Core
+	x uint32 //X 32-bit register
+	y uint32 //Y 32-bit register
+	t uint32 //T 32-bit register
+	p uint32 //P 32-bit register
+	u uint32 //U 32-bit register
+	o uint8  //O 8-bit opcode register
 
-// Pointers
-var pc uint32 = 256 //Program Counter
-var sp uint8        //Stack Pointer
+	pc uint32 //Program Counter 32-bit
+	sp uint8  //Stack Pointer 8-bit
 
-// Flags
-var ef, mf, inf, hei byte // Equal flag, Math Flag, Interrupt Flag
+	e byte //Equal Flag
+	m byte //Math Flag
+	i byte //Interrupt Flag
+	h byte //Hardware Interrupt Flag
+
+	stack [256]uint32 //Stack 32-bit
+
+	cycle int //Cycle Counter
+}
+
+var cpu1 core //cpu1
 
 // Emulation Flags
 var debugDisplay byte = 0
 var debugLast byte = 0
 
-// Execution Cycle of Hawk Core
-func cycle() {
-	getInstruction()
-	decodeInstruction()
+func main() { // Function Main - First to be called by Golang
+	setup()
 }
 
-// Setup certain aspects of the Hawk
-func setup() {
-	loadRom()          // Load contents of rom.txt into Memory
+func setup() { // Setup certain aspects of the Hawk
+
+	loadRom()          // Load rom.bin into Memory
+	loadProgram()      // Load contents of rom.txt into Memory
 	memory[524287] = 1 // Set keyboard address to 1
 
-	// Keyboard Check function, sets address 524287 in emulation memory to value of keyboard in ascii
-	go func() {
+	go func() { // Keyboard Check function, sets address 524287 in emulation memory to value of keyboard in ascii
 		for {
 			char, _, err := keyboard.GetSingleKey()
 			if err != nil {
@@ -98,8 +107,7 @@ func setup() {
 		}
 	}()
 
-	// SPE_ Internal Timer Chip
-	go func() {
+	go func() { // SPE_ Internal Timer Chip
 		for {
 			memory[524286] += 1
 			if memory[524286] > 60 {
@@ -108,13 +116,12 @@ func setup() {
 		}
 	}()
 
-	//DebugDisplay
-	go func() {
+	go func() { //DebugDisplay
 		for {
 			if debugDisplay == 1 {
-				fmt.Print("\033[H\033[2J")
-				fmt.Println("RX:", rx, "RY:", ry, "RT:", rt, "RP:", rp, "RU:", ru)
-				fmt.Println("PC:", pc, "IR:", ir, "EF:", ef, "MF:", mf, "KB:", memory[524287])
+				fmt.Println("X:", cpu1.x, "Y:", cpu1.y, "T:", cpu1.t, "P:", cpu1.p, "U:", cpu1.u, "TC:", cpu1.cycle)
+				fmt.Println("PC:", cpu1.pc, "OP:", cpu1.o, "EF:", cpu1.e, "MF:", cpu1.m, "IF:", cpu1.i, "KEY:", memory[524287])
+				fmt.Println("--------------------")
 			}
 		}
 	}()
@@ -122,655 +129,661 @@ func setup() {
 	EmulationLoop() // Let the emulation go into it's loop
 }
 
-// Main Emulation Loop of Emulator
-func EmulationLoop() {
+func EmulationLoop() { // Main Emulation Loop of Emulator
 	for {
 		cycle()
 	}
 }
 
-// Function Main - First to be called by Golang
-func main() {
-	setup()
+func cycle() { // Execution Cycle of Owl cpu1
+	getOpcode()
+	decodeOpcode()
 }
 
-// Hawk Core Decoder
-func decodeInstruction() {
-	switch ir {
+func getOpcode() {
+	cpu1.o = uint8(memory[cpu1.pc])
+	cpu1.cycle += 1
+}
+
+func decodeOpcode() { // Owl Core Opcode Decode
+	cpu1.cycle += 1
+	switch cpu1.o {
+	case 0:
+		cpu1.x = memory[cpu1.pc-2]
+		cpu1.y = memory[cpu1.pc-1]
+		cpu1.t = memory[cpu1.pc]
+		cpu1.p = memory[cpu1.pc+1]
+		cpu1.u = memory[cpu1.pc+2]
 	case 100:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			rx = memory[pc+2]
+			cpu1.x = memory[cpu1.pc+2]
 		case 2:
-			ry = memory[pc+2]
+			cpu1.y = memory[cpu1.pc+2]
 		case 3:
-			rt = memory[pc+2]
+			cpu1.t = memory[cpu1.pc+2]
 		case 4:
-			rp = memory[pc+2]
+			cpu1.p = memory[cpu1.pc+2]
 		case 5:
-			ru = memory[pc+2]
+			cpu1.u = memory[cpu1.pc+2]
 		}
-		pc += 3
+		cpu1.pc += 3
 		//---------------------------
 	case 101:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			rx = memory[memory[pc+2]]
+			cpu1.x = memory[memory[cpu1.pc+2]]
 		case 2:
-			ry = memory[memory[pc+2]]
+			cpu1.y = memory[memory[cpu1.pc+2]]
 		case 3:
-			rt = memory[memory[pc+2]]
+			cpu1.t = memory[memory[cpu1.pc+2]]
 		case 4:
-			rp = memory[memory[pc+2]]
+			cpu1.p = memory[memory[cpu1.pc+2]]
 		case 5:
-			ru = memory[memory[pc+2]]
+			cpu1.u = memory[memory[cpu1.pc+2]]
 		}
-		pc += 3
+		cpu1.pc += 3
 	case 102:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			rx = memory[memory[pc+2]+rp]
+			cpu1.x = memory[memory[cpu1.pc+2]+cpu1.p]
 		case 2:
-			ry = memory[memory[pc+2]+rp]
+			cpu1.y = memory[memory[cpu1.pc+2]+cpu1.p]
 		case 3:
-			rt = memory[memory[pc+2]+rp]
+			cpu1.t = memory[memory[cpu1.pc+2]+cpu1.p]
 		case 4:
-			rp = memory[memory[pc+2]+rp]
+			cpu1.p = memory[memory[cpu1.pc+2]+cpu1.p]
 		case 5:
-			ru = memory[memory[pc+2]+rp]
+			cpu1.u = memory[memory[cpu1.pc+2]+cpu1.p]
 		}
-		pc += 3
+		cpu1.pc += 3
 	case 103:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			rx = memory[memory[pc+2]+ru]
+			cpu1.x = memory[memory[cpu1.pc+2]+cpu1.u]
 		case 2:
-			ry = memory[memory[pc+2]+ru]
+			cpu1.y = memory[memory[cpu1.pc+2]+cpu1.u]
 		case 3:
-			rt = memory[memory[pc+2]+ru]
+			cpu1.t = memory[memory[cpu1.pc+2]+cpu1.u]
 		case 4:
-			rp = memory[memory[pc+2]+ru]
+			cpu1.p = memory[memory[cpu1.pc+2]+cpu1.u]
 		case 5:
-			ru = memory[memory[pc+2]+ru]
+			cpu1.u = memory[memory[cpu1.pc+2]+cpu1.u]
 		}
-		pc += 3
+		cpu1.pc += 3
 	case 104:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			memory[memory[pc+2]] = rx
+			memory[memory[cpu1.pc+2]] = cpu1.x
 		case 2:
-			memory[memory[pc+2]] = ry
+			memory[memory[cpu1.pc+2]] = cpu1.y
 		case 3:
-			memory[memory[pc+2]] = rt
+			memory[memory[cpu1.pc+2]] = cpu1.t
 		case 4:
-			memory[memory[pc+2]] = rp
+			memory[memory[cpu1.pc+2]] = cpu1.p
 		case 5:
-			memory[memory[pc+2]] = ru
+			memory[memory[cpu1.pc+2]] = cpu1.u
 		}
-		pc += 3
+		cpu1.pc += 3
 	case 105:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			memory[memory[pc+2]+rp] = rx
+			memory[memory[cpu1.pc+2]+cpu1.p] = cpu1.x
 		case 2:
-			memory[memory[pc+2]+rp] = ry
+			memory[memory[cpu1.pc+2]+cpu1.p] = cpu1.y
 		case 3:
-			memory[memory[pc+2]+rp] = rt
+			memory[memory[cpu1.pc+2]+cpu1.p] = cpu1.t
 		case 4:
-			memory[memory[pc+2]+rp] = rp
+			memory[memory[cpu1.pc+2]+cpu1.p] = cpu1.p
 		case 5:
-			memory[memory[pc+2]+rp] = ru
+			memory[memory[cpu1.pc+2]+cpu1.p] = cpu1.u
 		}
-		pc += 3
+		cpu1.pc += 3
 	case 106:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			memory[memory[pc+2]+ru] = rx
+			memory[memory[cpu1.pc+2]+cpu1.u] = cpu1.x
 		case 2:
-			memory[memory[pc+2]+ru] = ry
+			memory[memory[cpu1.pc+2]+cpu1.u] = cpu1.y
 		case 3:
-			memory[memory[pc+2]+ru] = rt
+			memory[memory[cpu1.pc+2]+cpu1.u] = cpu1.t
 		case 4:
-			memory[memory[pc+2]+ru] = rp
+			memory[memory[cpu1.pc+2]+cpu1.u] = cpu1.p
 		case 5:
-			memory[memory[pc+2]+ru] = ru
+			memory[memory[cpu1.pc+2]+cpu1.u] = cpu1.u
 		}
-		pc += 3
+		cpu1.pc += 3
 	case 107:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			rx += 1
+			cpu1.x += 1
 		case 2:
-			ry += 1
+			cpu1.y += 1
 		case 3:
-			rt += 1
+			cpu1.t += 1
 		case 4:
-			rp += 1
+			cpu1.p += 1
 		case 5:
-			ru += 1
+			cpu1.u += 1
 		}
-		pc += 2
+		cpu1.pc += 2
 	case 108:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			rx -= 1
+			cpu1.x -= 1
 		case 2:
-			ry -= 1
+			cpu1.y -= 1
 		case 3:
-			rt -= 1
+			cpu1.t -= 1
 		case 4:
-			rp -= 1
+			cpu1.p -= 1
 		case 5:
-			ru -= 1
+			cpu1.u -= 1
 		}
-		pc += 2
+		cpu1.pc += 2
 	case 109:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = rx - 0
+				cpu1.x = cpu1.x - 0
 			case 2:
-				ry = rx
+				cpu1.y = cpu1.x
 			case 3:
-				rt = rx
+				cpu1.t = cpu1.x
 			case 4:
-				rp = rx
+				cpu1.p = cpu1.x
 			case 5:
-				ru = rx
+				cpu1.u = cpu1.x
 			}
-			pc += 3
+			cpu1.pc += 3
 		case 2:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = ry
+				cpu1.x = cpu1.y
 			case 2:
-				ry = ry - 0
+				cpu1.y = cpu1.y - 0
 			case 3:
-				rt = ry
+				cpu1.t = cpu1.y
 			case 4:
-				rp = ry
+				cpu1.p = cpu1.y
 			case 5:
-				ru = ry
+				cpu1.u = cpu1.y
 			}
-			pc += 3
+			cpu1.pc += 3
 		case 3:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = rt
+				cpu1.x = cpu1.t
 			case 2:
-				ry = rt
+				cpu1.y = cpu1.t
 			case 3:
-				rt = rt - 0
+				cpu1.t = cpu1.t - 0
 			case 4:
-				rp = rt
+				cpu1.p = cpu1.t
 			case 5:
-				ru = rt
+				cpu1.u = cpu1.t
 			}
-			pc += 3
+			cpu1.pc += 3
 		case 4:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = rp
+				cpu1.x = cpu1.p
 			case 2:
-				ry = rp
+				cpu1.y = cpu1.p
 			case 3:
-				rt = rp
+				cpu1.t = cpu1.p
 			case 4:
-				rp = rp - 0
+				cpu1.p = cpu1.p - 0
 			case 5:
-				ru = rp
+				cpu1.u = cpu1.p
 			}
-			pc += 3
+			cpu1.pc += 3
 		case 5:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = ru
+				cpu1.x = cpu1.u
 			case 2:
-				ry = ru
+				cpu1.y = cpu1.u
 			case 3:
-				rt = ru
+				cpu1.t = cpu1.u
 			case 4:
-				rp = ru
+				cpu1.p = cpu1.u
 			case 5:
-				ru = ru - 0
+				cpu1.u = cpu1.u - 0
 			}
-			pc += 3
+			cpu1.pc += 3
 		}
 	case 110:
-		pc = memory[pc+1]
+		cpu1.pc = memory[cpu1.pc+1]
 	case 111:
-		if ef == 1 {
-			pc = memory[pc+1]
-			ef = 0
+		if cpu1.e == 1 {
+			cpu1.pc = memory[cpu1.pc+1]
+			cpu1.e = 0
 		} else {
-			pc += 2
+			cpu1.pc += 2
 		}
 	case 112:
-		if ef == 0 {
-			pc = memory[pc+1]
+		if cpu1.e == 0 {
+			cpu1.pc = memory[cpu1.pc+1]
 		} else {
-			pc += 2
+			cpu1.pc += 2
 		}
 	case 113:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = rx + rx
+				cpu1.x = cpu1.x + cpu1.x
 			case 2:
-				ry = ry + rx
+				cpu1.y = cpu1.y + cpu1.x
 			case 3:
-				rt = rt + rx
+				cpu1.t = cpu1.t + cpu1.x
 			case 4:
-				rp = rp + rx
+				cpu1.p = cpu1.p + cpu1.x
 			case 5:
-				ru = ru + rx
+				cpu1.u = cpu1.u + cpu1.x
 			}
-			pc += 3
+			cpu1.pc += 3
 		case 2:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = rx + ry
+				cpu1.x = cpu1.x + cpu1.y
 			case 2:
-				ry = ry + ry
+				cpu1.y = cpu1.y + cpu1.y
 			case 3:
-				rt = rt + ry
+				cpu1.t = cpu1.t + cpu1.y
 			case 4:
-				rp = rp + ry
+				cpu1.p = cpu1.p + cpu1.y
 			case 5:
-				ru = ru + ry
+				cpu1.u = cpu1.u + cpu1.y
 			}
-			pc += 3
+			cpu1.pc += 3
 		case 3:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = rx + rt
+				cpu1.x = cpu1.x + cpu1.t
 			case 2:
-				ry = ry + rt
+				cpu1.y = cpu1.y + cpu1.t
 			case 3:
-				rt = rt + rt
+				cpu1.t = cpu1.t + cpu1.t
 			case 4:
-				rp = rp + rt
+				cpu1.p = cpu1.p + cpu1.t
 			case 5:
-				ru = ru + rt
+				cpu1.u = cpu1.u + cpu1.t
 			}
-			pc += 3
+			cpu1.pc += 3
 		case 4:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = rx + rp
+				cpu1.x = cpu1.x + cpu1.p
 			case 2:
-				ry = ry + rp
+				cpu1.y = cpu1.y + cpu1.p
 			case 3:
-				rt = rt + rp
+				cpu1.t = cpu1.t + cpu1.p
 			case 4:
-				rp = rp + rp
+				cpu1.p = cpu1.p + cpu1.p
 			case 5:
-				ru = ru + rp
+				cpu1.u = cpu1.u + cpu1.p
 			}
-			pc += 3
+			cpu1.pc += 3
 		case 5:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = rx + ru
+				cpu1.x = cpu1.x + cpu1.u
 			case 2:
-				ry = ry + ru
+				cpu1.y = cpu1.y + cpu1.u
 			case 3:
-				rt = rt + ru
+				cpu1.t = cpu1.t + cpu1.u
 			case 4:
-				rp = rp + ru
+				cpu1.p = cpu1.p + cpu1.u
 			case 5:
-				ru = ru + ru
+				cpu1.u = cpu1.u + cpu1.u
 			}
-			pc += 3
+			cpu1.pc += 3
 		}
 	case 114:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = rx - rx
+				cpu1.x = cpu1.x - cpu1.x
 			case 2:
-				ry = ry - rx
+				cpu1.y = cpu1.y - cpu1.x
 			case 3:
-				rt = rt - rx
+				cpu1.t = cpu1.t - cpu1.x
 			case 4:
-				rp = rp - rx
+				cpu1.p = cpu1.p - cpu1.x
 			case 5:
-				ru = ru - rx
+				cpu1.u = cpu1.u - cpu1.x
 			}
-			pc += 3
+			cpu1.pc += 3
 		case 2:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = rx - ry
+				cpu1.x = cpu1.x - cpu1.y
 			case 2:
-				ry = ry - ry
+				cpu1.y = cpu1.y - cpu1.y
 			case 3:
-				rt = rt - ry
+				cpu1.t = cpu1.t - cpu1.y
 			case 4:
-				rp = rp - ry
+				cpu1.p = cpu1.p - cpu1.y
 			case 5:
-				ru = ru - ry
+				cpu1.u = cpu1.u - cpu1.y
 			}
-			pc += 3
+			cpu1.pc += 3
 		case 3:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = rx - rt
+				cpu1.x = cpu1.x - cpu1.t
 			case 2:
-				ry = ry - rt
+				cpu1.y = cpu1.y - cpu1.t
 			case 3:
-				rt = rt - rt
+				cpu1.t = cpu1.t - cpu1.t
 			case 4:
-				rp = rp - rt
+				cpu1.p = cpu1.p - cpu1.t
 			case 5:
-				ru = ru - rt
+				cpu1.u = cpu1.u - cpu1.t
 			}
-			pc += 3
+			cpu1.pc += 3
 		case 4:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = rx - rp
+				cpu1.x = cpu1.x - cpu1.p
 			case 2:
-				ry = ry - rp
+				cpu1.y = cpu1.y - cpu1.p
 			case 3:
-				rt = rt - rp
+				cpu1.t = cpu1.t - cpu1.p
 			case 4:
-				rp = rp - rp
+				cpu1.p = cpu1.p - cpu1.p
 			case 5:
-				ru = ru - rp
+				cpu1.u = cpu1.u - cpu1.p
 			}
-			pc += 3
+			cpu1.pc += 3
 		case 5:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				rx = rx - ru
+				cpu1.x = cpu1.x - cpu1.u
 			case 2:
-				ry = ry - ru
+				cpu1.y = cpu1.y - cpu1.u
 			case 3:
-				rt = rt - ru
+				cpu1.t = cpu1.t - cpu1.u
 			case 4:
-				rp = rp - ru
+				cpu1.p = cpu1.p - cpu1.u
 			case 5:
-				ru = ru - ru
+				cpu1.u = cpu1.u - cpu1.u
 			}
-			pc += 3
+			cpu1.pc += 3
 		}
 	case 115:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			if rx == memory[pc+2] {
-				ef = 1
-				pc += 3
+			if cpu1.x == memory[cpu1.pc+2] {
+				cpu1.e = 1
+				cpu1.pc += 3
 			} else {
-				pc += 3
+				cpu1.pc += 3
 			}
 		case 2:
-			if ry == memory[pc+2] {
-				ef = 1
-				pc += 3
+			if cpu1.y == memory[cpu1.pc+2] {
+				cpu1.e = 1
+				cpu1.pc += 3
 			} else {
-				pc += 3
+				cpu1.pc += 3
 			}
 		case 3:
-			if rt == memory[pc+2] {
-				ef = 1
-				pc += 3
+			if cpu1.t == memory[cpu1.pc+2] {
+				cpu1.e = 1
+				cpu1.pc += 3
 			} else {
-				pc += 3
+				cpu1.pc += 3
 			}
 		case 4:
-			if rp == memory[pc+2] {
-				ef = 1
-				pc += 3
+			if cpu1.p == memory[cpu1.pc+2] {
+				cpu1.e = 1
+				cpu1.pc += 3
 			} else {
-				pc += 3
+				cpu1.pc += 3
 			}
 		case 5:
-			if ru == memory[pc+2] {
-				ef = 1
-				pc += 3
+			if cpu1.u == memory[cpu1.pc+2] {
+				cpu1.e = 1
+				cpu1.pc += 3
 			} else {
-				pc += 3
+				cpu1.pc += 3
 			}
 		}
 	case 116:
-		if memory[pc+1] == 1 {
-			ef = 1
-			pc += 2
-		} else if memory[pc+1] == 0 {
-			ef = 0
-			pc += 2
+		switch memory[cpu1.pc+1] {
+		case 1:
+			cpu1.e = 1
+			cpu1.pc += 2
+		case 0:
+			cpu1.e = 0
+			cpu1.pc += 2
 		}
 	case 117:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			stack[sp] = rx
-			sp += 1
+			cpu1.stack[cpu1.sp] = cpu1.x
+			cpu1.sp += 1
 		case 2:
-			stack[sp] = ry
-			sp += 1
+			cpu1.stack[cpu1.sp] = cpu1.y
+			cpu1.sp += 1
 		case 3:
-			stack[sp] = rt
-			sp += 1
+			cpu1.stack[cpu1.sp] = cpu1.t
+			cpu1.sp += 1
 		case 4:
-			stack[sp] = rp
+			cpu1.stack[cpu1.sp] = cpu1.p
 		case 5:
-			stack[sp] = ru
+			cpu1.stack[cpu1.sp] = cpu1.u
 		}
-		pc += 2
+		cpu1.pc += 2
 	case 118:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			rx = stack[sp]
+			cpu1.x = cpu1.stack[cpu1.sp]
 		case 2:
-			ry = stack[sp]
+			cpu1.y = cpu1.stack[cpu1.sp]
 		case 3:
-			rt = stack[sp]
+			cpu1.t = cpu1.stack[cpu1.sp]
 		case 4:
-			rp = stack[sp]
+			cpu1.p = cpu1.stack[cpu1.sp]
 		case 5:
-			ru = stack[sp]
+			cpu1.u = cpu1.stack[cpu1.sp]
 		}
-		pc += 2
+		cpu1.pc += 2
 	case 119:
-		sp += 1
-		pc += 1
+		cpu1.sp += 1
+		cpu1.pc += 1
 	case 120:
-		sp -= 1
-		pc += 1
+		cpu1.sp -= 1
+		cpu1.pc += 1
 	case 121:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			hei = 1
-			pc += 2
+			cpu1.h = 1
+			cpu1.pc += 2
 		case 0:
-			hei = 0
-			pc += 2
+			cpu1.h = 0
+			cpu1.pc += 2
 		}
 	case 123:
-		pc += 1
+		cpu1.pc += 1
 	case 124: //WRITE OUT REGISTER TO DISPLAY
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			fmt.Print(string(rx))
+			fmt.Print(string(cpu1.x))
 		case 2:
-			fmt.Print(string(ry))
+			fmt.Print(string(cpu1.y))
 		case 3:
-			fmt.Print(string(rt))
+			fmt.Print(string(cpu1.t))
 		case 4:
-			fmt.Print(string(rp))
+			fmt.Print(string(cpu1.p))
 		case 5:
-			fmt.Print(string(ru))
+			fmt.Print(string(cpu1.u))
 		}
-		pc += 2
+		cpu1.pc += 2
 	case 125:
 		fmt.Printf("\b \b")
-		pc += 1
+		cpu1.pc += 1
 	case 126:
-		stack[sp] = pc + 2
-		sp += 1
-		pc = memory[pc+1]
+		cpu1.stack[cpu1.sp] = cpu1.pc + 2
+		cpu1.sp += 1
+		cpu1.pc = memory[cpu1.pc+1]
 	case 127:
-		sp -= 1
-		pc = stack[sp]
+		cpu1.sp -= 1
+		cpu1.pc = cpu1.stack[cpu1.sp]
 	case 128:
-		stack[sp] = pc + 1
-		sp += 1
-		pc += 1
+		cpu1.stack[cpu1.sp] = cpu1.pc + 1
+		cpu1.sp += 1
+		cpu1.pc += 1
 	case 129:
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				if rx == rx {
-					ef = 1
-					pc += 3
+				if cpu1.x == cpu1.x {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
 			case 2:
-				if rx == ry {
-					ef = 1
-					pc += 3
+				if cpu1.x == cpu1.y {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
 			case 3:
-				if rx == rt {
-					ef = 1
-					pc += 3
+				if cpu1.x == cpu1.t {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
 			case 4:
-				if rx == rp {
-					ef = 1
-					pc += 3
+				if cpu1.x == cpu1.p {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
 			case 5:
-				if rx == ru {
-					ef = 1
-					pc += 3
+				if cpu1.x == cpu1.u {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
 			}
 		case 2:
-			switch memory[pc+2] {
+			switch memory[cpu1.pc+2] {
 			case 1:
-				if ry == rx {
-					ef = 1
-					pc += 3
+				if cpu1.y == cpu1.x {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
-				if ry == ry {
-					ef = 1
-					pc += 3
+				if cpu1.y == cpu1.y {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
-				if ry == rt {
-					ef = 1
-					pc += 3
+				if cpu1.y == cpu1.t {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
-				if ry == rp {
-					ef = 1
-					pc += 3
+				if cpu1.y == cpu1.p {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
-				if ry == ru {
-					ef = 1
-					pc += 3
+				if cpu1.y == cpu1.u {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
 			case 3:
-				if rt == rx {
-					ef = 1
-					pc += 3
+				if cpu1.t == cpu1.x {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
-				if rt == ry {
-					ef = 1
-					pc += 3
+				if cpu1.t == cpu1.y {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
 			case 4:
-				if rp == rx {
-					ef = 1
-					pc += 3
+				if cpu1.p == cpu1.x {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
-				if rp == ry {
-					ef = 1
-					pc += 3
+				if cpu1.p == cpu1.y {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
-				if rp == rt {
-					ef = 1
-					pc += 3
+				if cpu1.p == cpu1.t {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
-				if rp == rp {
-					ef = 1
-					pc += 3
+				if cpu1.p == cpu1.p {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
-				if rp == ru {
-					ef = 1
-					pc += 3
+				if cpu1.p == cpu1.u {
+					cpu1.e = 1
+					cpu1.pc += 3
 				} else {
-					pc += 3
+					cpu1.pc += 3
 				}
 			}
-
 		}
 	case 130:
 		fmt.Println("")
-		pc += 1
+		cpu1.pc += 1
 	case 131: //write out register without ascii conversion
-		switch memory[pc+1] {
+		switch memory[cpu1.pc+1] {
 		case 1:
-			fmt.Print(rx)
+			fmt.Print(cpu1.x)
 		case 2:
-			fmt.Print(ry)
+			fmt.Print(cpu1.y)
 		case 3:
-			fmt.Print(rt)
+			fmt.Print(cpu1.t)
 		case 4:
-			fmt.Print(rp)
+			fmt.Print(cpu1.p)
 		case 5:
-			fmt.Print(ru)
+			fmt.Print(cpu1.u)
 		}
-		pc += 2
+		cpu1.pc += 2
 	case 132:
 		fmt.Print("\033[H\033[2J")
-		pc += 1
+		cpu1.pc += 1
 	case 133: //Print Nothing, basically a space
 		fmt.Print(" ")
-		pc += 1
+		cpu1.pc += 1
 	}
 }
 
-func getInstruction() {
-	ir = uint8(memory[pc])
-}
-
-func loadRom() {
+func loadProgram() {
 	fmt.Println("Owl | Rom Loader")
 	var count int = 0 //Memory Counter, place line at this memory address
 
@@ -805,6 +818,42 @@ func loadRom() {
 	}
 	fmt.Println("Owl | Init.")
 	time.Sleep(1 * time.Second)
+	fmt.Print("\033[H\033[2J")
+	f.Close()
+}
+
+func loadRom() {
+	fmt.Println("Owl | Rom Loader")
+	var count int = 0 //Memory Counter, place line at this memory address
+
+	//Thanks to stackoverflow and some other golang education website, Still don't understand this
+	f, err := os.Open("rom.bin")
+	if err != nil {
+		log.Fatal(err)
+	}
+	//----
+
+	//Get a line
+	scanner := bufio.NewScanner(f)
+
+	//Read file and then store it at appropriate memory address
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "loadAddress" {
+			scanner.Scan()
+			line := scanner.Text()
+			linec, _ := strconv.Atoi(line)
+			count = linec
+			fmt.Println("Setting as", linec, "| Set!:", count)
+
+		} else {
+			line2, _ := strconv.Atoi(line)
+			memory[count] = uint32(line2)
+			fmt.Println("Writing *", line2, "* | Written:", memory[count], "*, | Moving onto next", count+1)
+			count += 1
+		}
+	}
+	fmt.Println("Owl | Init.")
 	fmt.Print("\033[H\033[2J")
 	f.Close()
 }
