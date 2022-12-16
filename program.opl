@@ -1,0 +1,4 @@
+make main() {
+    println none
+};
+return 0

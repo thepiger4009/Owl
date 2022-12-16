@@ -1,10 +1,12 @@
 //main.go
 /*
 Owl Virtual Machine
-Build:  1.1.4
-Date:   12-5-22
+Build:  1.1.8
+Date:   12-16-22
 Author: Landon Smith
-----------------------------
+
+____________________
+
 MIT License
 
 Copyright (c) 2022 thepiger4009
@@ -52,6 +54,7 @@ type core struct { //Core
 	p uint32 //P 32-bit register
 	u uint32 //U 32-bit register
 	o uint8  //O 8-bit opcode register
+	r uint32 //R 32-bit Software Interrupt Watch Register
 
 	pc uint32 //Program Counter 32-bit
 	sp uint8  //Stack Pointer 8-bit
@@ -59,7 +62,10 @@ type core struct { //Core
 	e byte //Equal Flag
 	m byte //Math Flag
 	i byte //Interrupt Flag
-	h byte //Hardware Interrupt Flag
+	h byte //Hardware Interrupt Flag (Manually needs triggered by a chip.)
+	s byte //Software Interrupt Flag (1-6)x,y,t,p,u,o
+
+	ipc uint32 //Interrupt Program Counter
 
 	stack [256]uint32 //Stack 32-bit
 
@@ -76,7 +82,7 @@ func main() { // Function Main - First to be called by Golang
 	setup()
 }
 
-func setup() { // Setup certain aspects of the Hawk
+func setup() { // Setup certain aspects of Owl
 
 	loadRom()          // Load rom.bin into Memory
 	loadProgram()      // Load contents of rom.txt into Memory
@@ -107,7 +113,7 @@ func setup() { // Setup certain aspects of the Hawk
 		}
 	}()
 
-	go func() { // SPE_ Internal Timer Chip
+	go func() { // Owl Internal Timer Chip
 		for {
 			memory[524286] += 1
 			if memory[524286] > 60 {
@@ -131,11 +137,12 @@ func setup() { // Setup certain aspects of the Hawk
 
 func EmulationLoop() { // Main Emulation Loop of Emulator
 	for {
-		cycle()
+		cpu1_cycle()
 	}
 }
 
-func cycle() { // Execution Cycle of Owl cpu1
+func cpu1_cycle() { // Execution Cycle of Owl cpu1
+	interruptHandler()
 	getOpcode()
 	decodeOpcode()
 }
@@ -143,6 +150,55 @@ func cycle() { // Execution Cycle of Owl cpu1
 func getOpcode() {
 	cpu1.o = uint8(memory[cpu1.pc])
 	cpu1.cycle += 1
+}
+
+func interruptHandler() {
+	cpu1.cycle += 1
+	switch cpu1.s {
+	case 1:
+		if cpu1.x == cpu1.r {
+			cpu1.i = 1
+		}
+	case 2:
+		if cpu1.y == cpu1.r {
+			cpu1.i = 1
+		}
+	case 3:
+		if cpu1.t == cpu1.r {
+			cpu1.i = 1
+		}
+	case 4:
+		if cpu1.p == cpu1.r {
+			cpu1.i = 1
+		}
+	case 5:
+		if cpu1.u == cpu1.r {
+			cpu1.i = 1
+		}
+	case 6:
+		if uint32(cpu1.o) == cpu1.r {
+			cpu1.i = 1
+		}
+	}
+	if cpu1.h == 1 {
+		cpu1.i = 1
+		cpu1.h = 0
+	}
+	if cpu1.i == 1 {
+		cpu1.stack[cpu1.sp] = cpu1.x
+		cpu1.stack[cpu1.sp+1] = cpu1.y
+		cpu1.stack[cpu1.sp+2] = cpu1.t
+		cpu1.stack[cpu1.sp+3] = cpu1.p
+		cpu1.stack[cpu1.sp+4] = cpu1.u
+		cpu1.stack[cpu1.sp+5] = cpu1.pc
+		cpu1.sp += 6
+		cpu1.i = 0
+		cpu1.pc = cpu1.ipc
+	}
+}
+
+func triggerInterrupt() {
+	cpu1.h = 1
 }
 
 func decodeOpcode() { // Owl Core Opcode Decode
@@ -780,6 +836,10 @@ func decodeOpcode() { // Owl Core Opcode Decode
 	case 133: //Print Nothing, basically a space
 		fmt.Print(" ")
 		cpu1.pc += 1
+	case 134: // Configure Interrupt
+		cpu1.ipc = memory[cpu1.pc+1]
+		cpu1.r = memory[cpu1.pc+2]
+		cpu1.pc += 3
 	}
 }
 

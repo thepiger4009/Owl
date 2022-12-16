@@ -1,5 +1,12 @@
-#~/assembler.py
+#assembler.py
 """
+Owl Virtual Machine Assembler
+Build: 1.0
+Date: 12-12-22
+Author: Landon Smith
+
+____________________________
+
 MIT License
 
 Copyright (c) 2022 thepiger4009
@@ -111,9 +118,14 @@ while 1:
 			t_address = aon.split("$"[0])
 			last_address_given = t_address[1]
 
-
 	if fullLine[0] == "mov":
 		vb+=3
+
+	if fullLine[0] == "byte":
+		vb+=1
+
+	if fullLine[0] == "sip":
+		vb+=2
 
 	if fullLine[0] == "shi":
 		vb+=2
@@ -200,6 +212,10 @@ while 1:
 		statements = fullLine[1].split(","[0])
 	except:
 		next
+
+	if fullLine[0] == "byte":
+		byte = fullLine[1]
+		rom.write(byte+"\n")
 
 	if fullLine[0] == "mov":
 		statement1 = statements[0]
@@ -785,6 +801,11 @@ while 1:
 
 	if fullLine[0] == "dsp":
 		rom.write("120\n")
+
+	if fullLine[0] == "sip":
+		address = fullLine[1].split("$"[0])
+		address = address[1]
+		rom.write("134\n"+address+"\n")
 
 	if fullLine[0] == "shi": # Set hardware interrupt.
 		val = fullLine[1]
