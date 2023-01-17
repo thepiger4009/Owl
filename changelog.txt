@@ -1,0 +1,13 @@
+Owl Virtual Machine Changelog
+v1.2.0
+
+- Rewritten
+- Removal of multiple 'pc+=3' lines that can just be done in one line.
+- Fixed stack pointer not increasing when pushing the p and u register onto stack.
+- Math flag now equals 1 on a mathmetical instruction being executed.
+- Removal of instructions no longer needed.
+- Reintroduced instruction into assembler that was left out for some reason.
+- Fixed comparing registers to other registers, I can't even explain how the hell I let it end up broken and so confusing.
+- Fixed issue in assembler where declaring a variable with a $ causes it to write that $ with the variables address. 
+
+

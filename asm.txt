@@ -1,0 +1,14 @@
+.var key $524287
+.var timer $524286
+*= $0
+*= !__init__
+
+
+*= !__Scheduler__
+    mov !timer,x
+    cmp x,#30
+    beq thread1
+    cmp x,#29
+    beq thread2
+    jmp !__Scheduler__
+return 0

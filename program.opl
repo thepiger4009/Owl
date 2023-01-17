@@ -1,0 +1,18 @@
+make __init__() {
+    declare key int := 0
+    go main
+};
+
+make main() {
+
+};
+
+make get_key() {
+    int key := $524287
+    if !key = 0 {
+        go 
+    };;
+    go get_key
+};
+
+make 
