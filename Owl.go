@@ -3,9 +3,9 @@
 ___________________
 Owl Virtual Machine
 
-v1.2.0
+v1.2.1
 
-1/2/23
+1/17/23
 ___________________
 MIT License
 
@@ -50,7 +50,6 @@ type owl_core struct { //
 	//____________________________________________________________
 	x, y, t, p, u uint32 //32bit Index Registers
 	o             uint8  //8bit Opcode Register
-	r             uint32 //32bit Software Interrupt Watch Register
 	//____________________________________________________________
 
 	//________
@@ -91,12 +90,12 @@ func main() {
 
 func owl_error_report(error_type string) {
 	display_statistics = 0
-	fmt.Print("\033[H\033[2J")
+
 	fmt.Println("Hello there! It seems something went wrong with your Owl Virtual Machine instance.")
 	fmt.Println("I am a error reporter and was triggered by", error_type, ".")
 	fmt.Println("")
 	fmt.Println("Statistics of this Owl Virtual Machine instance on error:")
-	fmt.Println("x:", cpu1.x, "y:", cpu1.y, "t:", cpu1.t, "p:", cpu1.pc, "u:", cpu1.u, "o:", cpu1.o, "r:", cpu1.r, "key:", mem[524287])
+	fmt.Println("x:", cpu1.x, "y:", cpu1.y, "t:", cpu1.t, "p:", cpu1.pc, "u:", cpu1.u, "o:", cpu1.o, "key:", mem[524287])
 	fmt.Println("pc:", cpu1.pc, "sp:", cpu1.sp, "ijp:", cpu1.ijp, "e:", cpu1.e, "m:", cpu1.m, "i:", cpu1.i)
 	fmt.Println("")
 	fmt.Println("")
@@ -144,18 +143,26 @@ func owlInit() {
 	}()
 	//________________________________________
 
-	//__________
-	//Timer Main
-	//___________________________
+	//_______
+	//IO Chip
+	//_________________________________________
 	go func() {
 		for {
+			//Timer
 			mem[524286] += 1
 			if mem[524286] > 60 {
 				mem[524286] = 0
 			}
+
+			//Interrupt Handler
+			if cpu1.i == 1 {
+				if mem[524286] == mem[524285] {
+					cpu1_interrupt()
+				}
+			}
 		}
 	}()
-	//___________________________
+	//_________________________________________
 
 	//_________________
 	//Statistic Display
@@ -163,7 +170,7 @@ func owlInit() {
 	go func() {
 		for {
 			if display_statistics == 1 {
-				fmt.Println("x:", cpu1.x, "y:", cpu1.y, "t:", cpu1.t, "p:", cpu1.p, "u:", cpu1.u, "o:", cpu1.o, "r:", cpu1.r, "key:", mem[524287])
+				fmt.Println("x:", cpu1.x, "y:", cpu1.y, "t:", cpu1.t, "p:", cpu1.p, "u:", cpu1.u, "o:", cpu1.o, "key:", mem[524287])
 				fmt.Println("pc:", cpu1.pc, "sp:", cpu1.sp, "ijp:", cpu1.ijp, "e:", cpu1.e, "m:", cpu1.m, "i:", cpu1.i)
 				fmt.Println("______________________________________")
 			}
@@ -232,8 +239,19 @@ func owl_execution_loop() {
 	}
 }
 
-// Owl Virtual Machine CPU1 functions
+// Owl CPU1 functions
 // _____
+func cpu1_interrupt() {
+	mem[524284] = cpu1.p
+	mem[524283] = cpu1.u
+	mem[524282] = cpu1.t
+	mem[524281] = cpu1.y
+	mem[524280] = cpu1.x
+	cpu1.stack[cpu1.sp] = cpu1.pc
+	cpu1.sp += 1
+	cpu1.pc = cpu1.ijp
+}
+
 func cpu1_cycle() {
 	cpu1_fetch()
 	cpu1_decode()
@@ -248,8 +266,6 @@ func cpu1_decode() {
 		owl_error_report("[OPCODE ERROR: Unknown Opcode]")
 	}
 	switch cpu1.o {
-	case 0:
-		owl_error_report("[OPCODE REPORTED AS 0/NO OPCODE GIVEN]")
 	case 100:
 		mov_dec() //mov #1,x
 	case 101:
@@ -314,6 +330,8 @@ func cpu1_decode() {
 		display_clear() //dcs
 	case 131:
 		display_space() //dsn
+	case 132:
+		sij() //sij $400
 	}
 }
 
@@ -1073,3 +1091,25 @@ func display_space() { //dsn
 }
 
 //_____________________________
+
+// _____________________________
+func sij() { //sji $400
+	cpu1.ijp = mem[cpu1.pc+1]
+	cpu1.pc += 2
+}
+
+//_____________________________
+
+// _____________________________
+func rti() { //rti
+	cpu1.sp -= 1
+	cpu1.pc = cpu1.stack[cpu1.pc]
+}
+
+//_____________________________
+
+// _____________________________
+func sif() { //sif
+	cpu1.i = 1
+	cpu1.pc += 1
+}

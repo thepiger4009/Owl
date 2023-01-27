@@ -1,18 +1,22 @@
-make __init__() {
-    declare key int := 0
-    go main
-};
-
-make main() {
-
-};
-
-make get_key() {
-    int key := $524287
-    if !key = 0 {
-        go 
+section main; void {
+    _den
+    do random;
+    key = $524287 ;
+    if key = @y {
+        key = #0 ;
+        $524287 = #0
+        print Your random number is !rnd
+        _den
     };;
-    go get_key
+    go main;
 };
 
-make 
+section endloop; void {
+    go endloop
+};
+
+section random; rnd {
+    rnd = $524286 ;
+};}
+
+*endfile

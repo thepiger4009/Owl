@@ -1,6 +1,6 @@
 #compiler.py
 """
-Owl Virtual Machine Compiler
+Owl Compiler
 Build: 1.0
 Date: 12-12-22
 Author: Landon Smith

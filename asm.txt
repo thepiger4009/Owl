@@ -1,14 +1,76 @@
-.var key $524287
-.var timer $524286
-*= $0
-*= !__init__
-
-
-*= !__Scheduler__
-    mov !timer,x
-    cmp x,#30
-    beq thread1
-    cmp x,#29
-    beq thread2
-    jmp !__Scheduler__
+*= $1024
+*= !main
+den 
+jsr !random
+mov $524287,x
+mov x,!key
+mov !key,y
+cmp y,#121
+bne !AfterIf1
+beq !doIf1
+*= !doIf1
+mov #0,x
+mov x,!key
+mov #89,x
+dra x
+mov #111,x
+dra x
+mov #117,x
+dra x
+mov #114,x
+dra x
+mov #32,x
+dra x
+mov #114,x
+dra x
+mov #97,x
+dra x
+mov #110,x
+dra x
+mov #100,x
+dra x
+mov #111,x
+dra x
+mov #109,x
+dra x
+mov #32,x
+dra x
+mov #110,x
+dra x
+mov #117,x
+dra x
+mov #109,x
+dra x
+mov #98,x
+dra x
+mov #101,x
+dra x
+mov #114,x
+dra x
+mov #32,x
+dra x
+mov #105,x
+dra x
+mov #115,x
+dra x
+mov #32,x
+dra x
+mov !rnd,x
+drv x
+den 
+*= !AfterIf1
+jmp !main
+jmp !cmpendloop
+*= !endloop
+jmp !endloop
+jmp !cmpendloop
+*= !random
+mov $524286,x
+mov x,!rnd
+rts
+.var key *
+.var rnd *
+*= !cmpendloop
+jmp !cmpendloop
+.var compilerTemp *
 return 0
