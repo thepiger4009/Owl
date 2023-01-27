@@ -1,9 +1,5 @@
 # Owl Virtual Machine Boot Rom
 
-section tempFix; void {
-    go main;
-};
-
 section main; void {
     # Variable Declaration
     key = #0 ; # Used for keyboard wait

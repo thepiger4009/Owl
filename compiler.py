@@ -93,10 +93,13 @@ while 1:
             asm.write(fullLine[x]),asm.write(" ")
         asm.write("\n")
 
-    if "$" in fullLine[0] and fullLine[1] == "#":
-        number = fullLine[1].strip("#"[0])
+    if "$" in fullLine[0] and fullLine[1] == "=" and "#" in fullLine[2]:
+        number = fullLine[2].strip("#"[0])
         address = fullLine[0].strip("$"[0])
-        asm.write("mov #"+number+",x\nmov x,$"+address+"\n")
+        number=number
+        address=address
+        asm.write("mov #"+str(number)+",x\nmov x,$"+str(address)+"\n")
+
 
     if fullLine[0] == "for" and fullLine[2] == "=" and "#" in fullLine[3] and fullLine[4] == "to" and "#" in fullLine[5]:
         forvar = fullLine[1]
@@ -122,7 +125,7 @@ while 1:
         var = fullLine[1]
         asm.write("mov !"+var+",y\n")
 
-        if fullLine[2] == "=":
+        if fullLine[2] == "=" and fullLine[4] == ";":
             if "#" in fullLine[3]:
                 ifnum = fullLine[3].split("#"[0])
                 ifnum=ifnum[1]
@@ -134,8 +137,40 @@ while 1:
                 ifnum = fullLine[3].split("@"[0])
                 ifnum=ifnum[1]
 
+                print('[compiler]: If statement with',var,"=",ord(ifnum))
                 asm.write("cmp y,#"+str(ord(ifnum))+"\nbne !AfterIf"+str(ifCounter)+"\nbeq !doIf"+str(ifCounter)+"\n")
                 asm.write("*= !doIf"+str(ifCounter)+"\n")
+
+        if fullLine[2] == "not" and fullLine[4] == ";":
+            if "#" in fullLine[3]:
+                ifnum = fullLine[3].split("#"[0])
+                ifnum=ifnum[1]
+
+                asm.write("cmp y,#"+str(ifnum)+"\nbne !doIf"+str(ifCounter)+"\nbeq !AfterIf"+str(ifCounter)+"\n")
+                asm.write("*= !doIf"+str(ifCounter)+"\n")
+
+            if "@" in fullLine[3]:
+                ifnum = fullLine[3].split("@"[0])
+                ifnum=ifnum[1]
+
+                asm.write("cmp y,#"+str(ord(ifnum))+"\nbne !doIf"+str(ifCounter)+"\nbeq !AfterIf"+str(ifCounter)+"\n")
+                asm.write("*= !doIf"+str(ifCounter)+"\n")
+        
+        if fullLine[2] == "=" and fullLine[5] == "else":
+            if "#" in fullLine[3]:
+                ifnum = fullLine[3].split("#"[0])
+                ifnum=ifnum[1]
+
+                asm.write("cmp y,#"+str(ifnum)+"\nbne !elseIf"+str(ifCounter)+"\nbeq !doIf"+str(ifCounter)+"\n")
+                asm.write("*= !doIf"+str(ifCounter)+"\n*= !elseIf"+str(ifCounter)+"\n")
+
+            if "@" in fullLine[3]:
+                ifnum = fullLine[3].split("@"[0])
+                ifnum=ifnum[1]
+
+                asm.write("cmp y,#"+str(ifnum)+"\nbne !elseIf"+str(ifCounter)+"\nbeq !doIf"+str(ifCounter)+"\n")
+                asm.write("*= !doIf"+str(ifCounter)+"\n*= !elseIf"+str(ifCounter)+"\n")
+
 
     if fullLine[0] == "};;}":
         asm.write("*= !AfterIf"+str(ifCounter)+"\n")
@@ -158,25 +193,52 @@ while 1:
         asm.write("dcs\n")
 
     if fullLine[0] == "do":
-        section_name = fullLine[1].split(";"[0])
-        section_name=section_name[0]
-        asm.write("jsr !"+section_name+"\n")
+        if "$" in fullLine[1]:
+            go_address = fullLine[1].split("$"[0])
+            go_address=go_address
+            asm.write('jsr $'+str(go_address)+"\n")
+        else:
+            section_name = fullLine[1].split(";"[0])
+            section_name=section_name[0]
+            asm.write("jsr !"+section_name+"\n")
 
     try:
         if fullLine[0] == "print":
             bg = 0
             for x in range(len(fullLine)):
-                if fullLine[x] == "+":
-                    asm.write("mov #32,x\ndra x\n")
                 if "!" in fullLine[x]:
                     var = fullLine[x].split("!"[0])
                     var=var[1]
                     asm.write("mov !"+var+",x\ndrv x\n")
+                elif "@" in fullLine[x]:
+                    var = fullLine[x].split("@"[0])
+                    var=var[1]
+                    asm.write("mov !"+var+",x\ndra x\n")
                 else:
                     if bg == 1:
                         for y in range(len(fullLine[x])):
                             asm.write("mov #"+str(ord(fullLine[x][y]))+",x\ndra x\n")
                         asm.write("mov #32,x\ndra x\n")
+                bg=1
+            asm.write("den\n")
+
+        if fullLine[0] == "printf":
+            bg = 0
+            for x in range(len(fullLine)):
+                if fullLine[x] == "\n":
+                    asm.write("den\n")
+                if "!" in fullLine[x]:
+                    var = fullLine[x].split("!"[0])
+                    var=var[1]
+                    asm.write("mov !"+var+",x\ndrv x\n")
+                elif "@" in fullLine[x]:
+                    var = fullLine[x].split("@"[0])
+                    var=var[1]
+                    asm.write("mov !"+var+",x\ndra x\n")
+                else:
+                    if bg == 1:
+                        for y in range(len(fullLine[x])):
+                            asm.write("mov #"+str(ord(fullLine[x][y]))+",x\ndra x\n")
                 bg=1
                     
 
@@ -463,9 +525,14 @@ while 1:
         call_name=call_name[0]
         asm.write('jsr !'+call_name+"\n")
     if fullLine[0] == 'go':
-        go_name = fullLine[1].split(';'[0])
-        go_name=go_name[0]
-        asm.write('jmp !'+go_name+"\n")
+        if "$" in fullLine[1]:
+            go_address = fullLine[1].split("$"[0])
+            go_address=go_address
+            asm.write('jmp $'+str(go_address)+"\n")
+        else:
+            go_name = fullLine[1].split(';'[0])
+            go_name=go_name[0]
+            asm.write('jmp !'+go_name+"\n")
 
     if fullLine[0] == "section":
         section_name = fullLine[1].split(';'[0])
