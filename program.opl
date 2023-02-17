@@ -1,18 +1,32 @@
-make __init__() {
-    declare key int := 0
+section main; void {
+    print Say hello to snapchat.
+    letter1 = getKey ;
+    printf @letter1
+    letter2 = getKey ;
+    printf @letter2
+    letter3 = getKey ;
+    printf @letter3
+    letter4 = getKey ;
+    printf @letter4 -n
+
+    if letter1,letter2,letter3,letter4 =& @s,@n,@a,@p go worked ;
+    go no
+}
+
+section no; void {
+    print That isn't a way to say hello
+    print Try again
+    print
     go main
-};
+}
 
-make main() {
+section worked; void {
+    print Yes, that is how you greet in snapchat
+    go wo
+}
 
-};
+section wo; void {
+    go wo
+}
 
-make get_key() {
-    int key := $524287
-    if !key = 0 {
-        go 
-    };;
-    go get_key
-};
-
-make 
+*endfile

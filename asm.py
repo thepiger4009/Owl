@@ -194,6 +194,9 @@ while 1:
 	if fullLine[0] == "bne":
 		vb+=2
 
+	if fullLine[0] == "sij":
+		vb+=2
+
 
 	lc+=1
 	if line == "return 0":
@@ -217,6 +220,28 @@ while 1:
 	if fullLine[0] == "byte":
 		byte = fullLine[1]
 		rom.write(byte+"\n")
+
+	if fullLine[0] == "sij":
+		try:
+			statement1 = statements[0]
+			statement2 = statements[1]
+		except:
+			next
+		if "!" in statement1:
+			try:
+				address_name = statement1.split("!"[0])
+			except:
+				next
+			address_got = getLabelAddress(address_name[1])
+			rom.write("132\n"),rom.write(str(address_got)),rom.write("\n")
+
+		if "$" in statement1:
+			try:
+				address_pos	= statement1.split("$"[0])
+			except:
+				next
+			rom.write("132\n"),rom.write(str(address_pos[1])),rom.write("\n")	
+
 
 	if fullLine[0] == "mov":
 		statement1 = statements[0]
@@ -254,7 +279,7 @@ while 1:
 				except:
 					next
 				address = getVariableAddress(statement3[1])
-				rom.write("101\n1\n"),rom.write(str(address[0])),rom.write("\n")
+				rom.write("101\n1\n"),rom.write(str(address)),rom.write("\n")
 			if "p%" in statement1: #Transfer mem+rp to register
 				try:
 					statement3 = statement1.split("p%"[0])
@@ -427,7 +452,7 @@ while 1:
 					statement3 = statement1.split("$"[0])
 				except:
 					next
-				rom.write("101\n3\n").rom.write(statement3[1]),rom.write("\n")
+				rom.write("101\n3\n"),rom.write(statement3[1]),rom.write("\n")
 			match statement1: #Transfer register to register
 				case "x":
 					rom.write("109\n1\n3\n")
